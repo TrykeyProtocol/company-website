@@ -53,7 +53,6 @@ const Button: React.FC<ButtonProps> = ({
         {...(props as Omit<ButtonAsLinkProps, "href" | "className">)}
       >
         {children}
-        
       </Link>
     );
   }
