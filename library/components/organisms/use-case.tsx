@@ -57,10 +57,11 @@ const UseCasesSection: React.FC = () => {
                 {images.map((_, index) => (
                   <button
                     key={index}
-                    className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentImage
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                      index === currentImage
                         ? "bg-lightMode-brand-accent dark:bg-darkMode-brand-accent w-4"
                         : "bg-gray-300 dark:bg-gray-600"
-                      }`}
+                    }`}
                     onClick={() => setCurrentImage(index)}
                   />
                 ))}
@@ -85,7 +86,7 @@ const UseCasesSection: React.FC = () => {
               Our Devices are designed to unlock a multitude of benefits across
               diverse industries:
             </p>
-            <ul className="space-y-3">
+            <ul className="space-y-3 mb-8">
               {[
                 "Logistics & Transportation",
                 "Healthcare & Medical Supplies",
@@ -106,15 +107,9 @@ const UseCasesSection: React.FC = () => {
               ))}
             </ul>
 
-            <motion.div
-              className="mt-8"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Button variant="primary" size="large">
-                Sign Up Now →
-              </Button>
-            </motion.div>
+            <Button variant="primary" size="large">
+              Sign Up Now →
+            </Button>
           </motion.div>
         </div>
       </div>

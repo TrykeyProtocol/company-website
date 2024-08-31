@@ -10,16 +10,20 @@ import UseCasesSection from "@/library/components/organisms/use-case";
 export default function Home() {
   return (
     <div className="flex flex-col">
-    <Navbar />
-    <div className="pt-16 lg:pt-20"> 
-      <LandingSection />
-      <UseCasesSection />
-      <UniquePropositionSection />
-      <AboutUsSection />
-      <HowItWorksSection />
-      <NewsLetterSection />
-      <Footer />
+      <Navbar />
+      <div className="pt-16 lg:pt-20"> 
+        <LandingSection />
+        <UseCasesSection />
+        <div id="features">
+          <UniquePropositionSection />
+        </div>
+        <div id="about-us">
+          <AboutUsSection />
+        </div>
+        <HowItWorksSection />
+        <NewsLetterSection />
+        <Footer />
+      </div>
     </div>
-  </div>
   );
 }

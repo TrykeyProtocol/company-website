@@ -12,22 +12,22 @@ interface TeamMember {
 const teamMembers: TeamMember[] = [
   {
     name: "Abdulmalik Adeyemo",
-    role: "Data Scientist/Robotics Engineer",
+    role: "Chief Executive Officer",
     image: "/images/landing/team/Abdulmalik.jpg",
   },
   {
     name: "Favour Udofiah",
-    role: "Data Scientist",
+    role: "Chief Financial Officer",
     image: "/images/landing/team/favour.jpeg",
   },
   {
     name: "Mololuwa Adeniyi",
-    role: "Robotics Engineer",
+    role: "Chief Operations Officer",
     image: "/images/landing/team/Mololuwa.jpg",
   },
   {
     name: "Khalifa Shuaib",
-    role: "Robotics Engineer",
+    role: "Chief Technology Officer",
     image: "/images/landing/team/khalifa.jpg",
   },
 ];
