@@ -7,6 +7,7 @@ import Logo from "../atoms/logo";
 import { Menu, X } from "lucide-react";
 import { ThemeSwitch } from "../atoms/theme-switch";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSmoothScroll } from "@/library/utils";
 
 interface HeadingProps {
   href: string;
@@ -15,22 +16,15 @@ interface HeadingProps {
   className?: string;
 }
 
-const Heading: React.FC<HeadingProps> = ({
-  href,
-  children,
-  onClick,
-  className,
-}) => {
+const Heading: React.FC<HeadingProps> = ({ href, children, onClick, className }) => {
   const router = useRouter();
+  const smoothScroll = useSmoothScroll();
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    if (href.startsWith("/#")) {
+    if (href.startsWith('/#')) {
       const targetId = href.slice(2);
-      const targetElement = document.getElementById(targetId);
-      if (targetElement) {
-        targetElement.scrollIntoView({ behavior: "smooth" });
-      }
+      smoothScroll(targetId);
     } else {
       router.push(href);
     }
