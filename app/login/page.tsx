@@ -76,7 +76,7 @@ const LoginPage = () => {
           </button>
           <div className="w-full flex flex-col items-center gap-3 mt-4 md:mt-0">
             <div className="text-center text-sm text-lightMode-text-main dark:text-darkMode-text-main transition-colors duration-300">
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <a
                 href="#"
                 className="font-medium text-lightMode-text-accent dark:text-darkMode-text-accent hover:text-lightMode-brand-primary dark:hover:text-darkMode-brand-primary transition-colors duration-300"
