@@ -17,6 +17,7 @@ const config: Config = {
           },
           background: {
             main: '#FFFFFF',
+            secondary: '#f3f4f6',
             alternate: '#FEE8E0'
           },
           text: {
@@ -37,6 +38,7 @@ const config: Config = {
           },
           background: {
             main: '#181818',
+            secondary: '#101010',
             alternate: '#0A0909'
           },
           text: {
