@@ -2,12 +2,19 @@ import React from "react";
 
 interface LogoProps {
   className?: string;
+  width?: number | string;
 }
 
-const Logo: React.FC<LogoProps> = ({ className = "" }) => {
+const Logo: React.FC<LogoProps> = ({ className = "", width }) => {
+  const defaultWidth = "auto";
+  const defaultHeight = "2rem"; // This is equivalent to the current h-8 class
+
+  const style = width ? { width, height: "auto" } : { width: defaultWidth, height: defaultHeight };
+
   return (
     <svg
-      className={`w-auto h-8 ${className}`}
+      className={className}
+      style={style}
       viewBox="0 0 323 81"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
