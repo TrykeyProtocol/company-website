@@ -12,6 +12,10 @@ import {
   Unlock,
   Lock,
   LightbulbOff,
+  Bell,
+  Home,
+  LineChart,
+  Settings,
 } from "lucide-react";
 import { ThemeSwitch } from "@/library/components/atoms/theme-switch";
 import DesktopNav from "@/library/components/molecules/desktop-nav";
@@ -28,11 +32,11 @@ const RoomDetailsPage: React.FC = () => {
   const [electricityOn, setElectricityOn] = useState(true);
 
   const navItems = [
-    {
-      icon: <ArrowLeft className="mr-2" />,
-      label: "Dashboard",
-      href: "/dashboard",
-    },
+    { icon: <Home className="mr-2" />, label: 'Index', href: '#' },
+    { icon: <Bell className="mr-2" />, label: 'Notifications', href: '#' },
+    { icon: <Settings className="mr-2" />, label: 'Settings', href: '#' },
+    { icon: <LineChart className="mr-2" />, label: 'Analytics', href: '#' },
+
   ];
   const toggleDoor = () => setDoorOpen(!doorOpen);
   const toggleElectricity = () => setElectricityOn(!electricityOn);
@@ -52,7 +56,7 @@ const RoomDetailsPage: React.FC = () => {
                 <ArrowLeft />
               </button>
               <h1 className="text-2xl font-bold text-lightMode-text-heading dark:text-darkMode-text-heading">
-                Room {assetId} Overview
+                Room {assetId}
               </h1>
             </div>
             <div className="flex items-center">

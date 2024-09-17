@@ -119,6 +119,7 @@ const Navbar: React.FC = () => {
                 variant="primary"
                 size="medium"
                 className="text-sm xl:text-base px-3 py-1.5 xl:px-4 xl:py-2"
+                href="/sign-up"
               >
                 Sign Up Now
               </Button>

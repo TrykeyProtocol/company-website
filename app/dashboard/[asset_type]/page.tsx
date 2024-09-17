@@ -11,6 +11,7 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
+  LineChart,
 } from "lucide-react";
 import { ThemeSwitch } from "@/library/components/atoms/theme-switch";
 import DesktopNav from "@/library/components/molecules/desktop-nav";
@@ -31,7 +32,7 @@ const RoomCard: React.FC<{
   };
 
   return (
-    <div 
+    <div
       className="bg-white dark:bg-darkMode-background-main rounded-2xl overflow-hidden shadow-md cursor-pointer transition-transform duration-300 hover:scale-105"
       onClick={handleClick}
     >
@@ -39,11 +40,11 @@ const RoomCard: React.FC<{
         src={image}
         alt={`Room ${roomNumber}`}
         width={300}
-        height={200}
-        className="w-full h-40 object-cover"
+        height={100}
+        className="w-full h-32 object-cover"
       />
-      <div className="p-4">
-        <h3 className="text-lg font-semibold text-lightMode-text-heading dark:text-darkMode-text-heading">
+      <div className="py-2 px-4">
+        <h3 className=" font-bold text-lightMode-text-heading dark:text-darkMode-text-heading">
           Room {roomNumber}
         </h3>
         <p className="text-sm text-lightMode-text-main dark:text-darkMode-text-main">
@@ -70,7 +71,7 @@ const DetailedView: React.FC = () => {
     ? assetType.charAt(0).toUpperCase() + assetType.slice(1)
     : "Asset";
 
-  // Mock data for rooms 
+  // Mock data for rooms
   const rooms = [
     {
       roomNumber: "301",
@@ -102,9 +103,39 @@ const DetailedView: React.FC = () => {
       image: "/images/dashboard/hotel.png",
       isOccupied: false,
     },
+    {
+      roomNumber: "307",
+      image: "/images/dashboard/hotel.png",
+      isOccupied: false,
+    },
+    {
+      roomNumber: "309",
+      image: "/images/dashboard/hotel.png",
+      isOccupied: true,
+    },
+    {
+      roomNumber: "311",
+      image: "/images/dashboard/hotel.png",
+      isOccupied: false,
+    },
+    {
+      roomNumber: "301",
+      image: "/images/dashboard/hotel.png",
+      isOccupied: true,
+    },
+    {
+      roomNumber: "303",
+      image: "/images/dashboard/hotel.png",
+      isOccupied: false,
+    },
+    {
+      roomNumber: "305",
+      image: "/images/dashboard/hotel.png",
+      isOccupied: true,
+    },
   ];
 
-  const itemsPerPage = 3;
+  const itemsPerPage = 6;
   const pageCount = Math.ceil(rooms.length / itemsPerPage);
 
   useEffect(() => {
@@ -134,11 +165,12 @@ const DetailedView: React.FC = () => {
     { icon: <Home className="mr-2" />, label: "Dashboard", href: "/dashboard" },
     { icon: <Bell className="mr-2" />, label: "Notifications", href: "#" },
     { icon: <Settings className="mr-2" />, label: "Settings", href: "#" },
+    { icon: <LineChart className="mr-2" />, label: "Analytics", href: "#" },
   ];
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-lightMode-background-secondary dark:bg-darkMode-background-secondary p-4 transition-colors duration-300">
-      <div className="w-full max-w-7xl h-auto md:h-[80vh] bg-lightMode-background-main dark:bg-darkMode-background-main rounded-3xl overflow-hidden md:shadow-2xl flex flex-col md:flex-row transition-colors duration-300">
+      <div className="w-full max-w-7xl h-auto md:h-[90vh] bg-lightMode-background-main dark:bg-darkMode-background-main rounded-3xl overflow-scroll md:shadow-2xl flex flex-col md:flex-row transition-colors duration-300">
         <DesktopNav navItems={navItems} />
         <div className="w-full md:w-4/5 px-4 md:px-6 lg:px-8 py-4 bg-lightMode-background-secondary dark:bg-darkMode-background-secondary flex flex-col justify-between">
           {/* Header */}
@@ -154,12 +186,13 @@ const DetailedView: React.FC = () => {
                 <Logo width={120} />
               </div>
               <h1 className="hidden md:block text-2xl font-bold text-lightMode-text-heading dark:text-darkMode-text-heading border-b-4 border-lightMode-text-accent dark:border-darkMode-text-accent">
-                {capitalizedAssetType} Overview
+                {/* {capitalizedAssetType} Overview */}
+                Dashboard
               </h1>
             </div>
             <div className="flex items-center">
               <ThemeSwitch />
-           
+
               <Image
                 src="/images/dashboard/pfp.png"
                 alt="User Avatar"
@@ -193,7 +226,11 @@ const DetailedView: React.FC = () => {
             )}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 flex-grow mx-4">
               {displayedRooms.map((room) => (
-                <RoomCard assetType={capitalizedAssetType} key={room.roomNumber} {...room} />
+                <RoomCard
+                  assetType={capitalizedAssetType}
+                  key={room.roomNumber}
+                  {...room}
+                />
               ))}
             </div>
             {isLargeScreen && (
@@ -212,43 +249,40 @@ const DetailedView: React.FC = () => {
           </div>
           {/* General Information */}
           <div className="  flex flex-col w-full justify-center items-center">
+            <div className="bg-lightMode-background-main dark:bg-darkMode-background-main p-6 rounded-2xl shadow-md w-[90%]">
+              <h2 className="text-xl font-semibold mb-4 text-lightMode-text-heading dark:text-darkMode-text-heading pb-2 border-b border-lightMode-text-main dark:border-darkMode-text-main">
+                General
+              </h2>
+              <div className="flex-grow border-t border-lightMode-background-main dark:border-darkMode-background-main w-full"></div>
 
-          <div className="bg-lightMode-background-main dark:bg-darkMode-background-main p-6 rounded-2xl shadow-md w-[90%]">
-            <h2 className="text-xl font-semibold mb-4 text-lightMode-text-heading dark:text-darkMode-text-heading pb-2 border-b border-lightMode-text-main dark:border-darkMode-text-main">
-              General
-            </h2>
-            <div className="flex-grow border-t border-lightMode-background-main dark:border-darkMode-background-main w-full"></div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className=" md:flex flex-col items-center">
-                <p className="text-sm text-lightMode-text-main dark:text-darkMode-text-main">
-                  Total No. of {capitalizedAssetType}s
-                </p>
-                <p className="text-2xl font-bold text-lightMode-text-heading dark:text-darkMode-text-heading">
-                  87
-                </p>
-              </div>
-              <div className=" md:flex flex-col items-center">
-                <p className="text-sm text-lightMode-text-main dark:text-darkMode-text-main">
-                  No. of Occupied {capitalizedAssetType}s
-                </p>
-                <p className="text-2xl font-bold text-lightMode-text-heading dark:text-darkMode-text-heading">
-                  50
-                </p>
-              </div>
-              <div className=" md:flex flex-col items-center">
-                <p className="text-sm text-lightMode-text-main dark:text-darkMode-text-main">
-                  Total Expected Yield
-                </p>
-                <p className="text-2xl font-bold text-lightMode-text-heading dark:text-darkMode-text-heading">
-                  ₦48,000
-                </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className=" md:flex flex-col items-center">
+                  <p className="text-2xl font-bold text-lightMode-text-heading dark:text-darkMode-text-heading">
+                    87
+                  </p>
+                  <p className="text-sm text-lightMode-text-main dark:text-darkMode-text-main">
+                    Total No. of {capitalizedAssetType}s
+                  </p>
+                </div>
+                <div className=" md:flex flex-col items-center">
+                  <p className="text-2xl font-bold text-lightMode-text-heading dark:text-darkMode-text-heading">
+                    50
+                  </p>
+                  <p className="text-sm text-lightMode-text-main dark:text-darkMode-text-main">
+                    No. of Occupied {capitalizedAssetType}s
+                  </p>
+                </div>
+                <div className=" md:flex flex-col items-center">
+                  <p className="text-2xl font-bold text-lightMode-text-heading dark:text-darkMode-text-heading">
+                    ₦48,000
+                  </p>
+                  <p className="text-sm text-lightMode-text-main dark:text-darkMode-text-main">
+                    Total Expected Yield
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-          </div>
-
-
         </div>
       </div>
       <MobileNav

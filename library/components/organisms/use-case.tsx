@@ -107,8 +107,8 @@ const UseCasesSection: React.FC = () => {
               ))}
             </ul>
 
-            <Button variant="primary" size="large">
-              Sign Up Now →
+            <Button variant="primary" size="large" href="/sign-up">
+              Sign Up Now
             </Button>
           </motion.div>
         </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { Home, Bell, Settings, ArrowLeft, MoreVertical, X } from "lucide-react";
+import { Home, Bell, Settings, ArrowLeft, MoreVertical, X, LineChart } from "lucide-react";
 import Image from "next/image";
 import Logo from "@/library/components/atoms/logo";
 import { ThemeSwitch } from "@/library/components/atoms/theme-switch";
@@ -85,7 +85,8 @@ const Dashboard = () => {
   const navItems = [
     { icon: <Home className="mr-2" />, label: 'Index', href: '#' },
     { icon: <Bell className="mr-2" />, label: 'Notifications', href: '#' },
-    { icon: <Settings className="mr-2" />, label: 'Setting', href: '#' },
+    { icon: <Settings className="mr-2" />, label: 'Settings', href: '#' },
+    { icon: <LineChart className="mr-2" />, label: 'Analytics', href: '#' },
   ];
 
   return (
@@ -105,7 +106,7 @@ const Dashboard = () => {
                 <Logo width={100} />
               </div>
               <h1 className="hidden md:block text-2xl font-bold text-lightMode-text-heading dark:text-darkMode-text-heading border-b-4 border-lightMode-text-accent dark:border-darkMode-text-accent">
-                INDEX
+                HOME
               </h1>
             </div>
             <div className="flex items-center">
