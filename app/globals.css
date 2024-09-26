@@ -7,3 +7,25 @@
     text-wrap: balance;
   }
 }
+
+@layer utilities {
+  .autofill-fix {
+    @apply [transition:background-color_5000s_ease-in-out_0s,color_5000s_ease-in-out_0s];
+  }
+}
+
+:root {
+  --toaster-bg: #FFFFFF;
+  --toaster-text: #5F6D7E;
+  --toaster-border: #F5F5F5;
+  --toaster-success: #4CAF50; /* Green color for success */
+  --toaster-error: #D84315; /* Deep orange color for error */
+}
+
+.dark {
+  --toaster-bg: #181818;
+  --toaster-text: #E0E0E0;
+  --toaster-border: #212121;
+  --toaster-success: #58d35c; /* Keep the same green for dark mode */
+  --toaster-error: #FF5722; /* Slightly lighter deep orange for better visibility in dark mode */
+}
