@@ -13,6 +13,7 @@ export const CustomToaster = () => {
           border: '1px solid var(--toaster-border)',
           padding: '16px',
           borderRadius: '8px',
+          fontSize: '14px'
         },
         success: {
           style: {

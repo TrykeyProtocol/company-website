@@ -16,19 +16,18 @@ interface SignUpData {
   last_name: string;
   email: string;
   password: string;
-  // account_number: string;
-  // bank: string;
+  confirm_password: string;
 }
 
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState<SignUpData>({
     first_name: "",
     last_name: "",
     email: "",
     password: "",
-    // account_number: "",
-    // bank: "",
+    confirm_password: "",
   });
 
   const router = useRouter();
@@ -44,16 +43,22 @@ const SignUpPage = () => {
     },
     onError: (error: Error) => {
       if (axios.isAxiosError(error)) {
-        if (error.code === "ECONNABORTED") {
-          toast.error("The request timed out. Please try again.");
+        const axiosError = error ;
+        if (axiosError.response?.data?.errors) {
+          const errors = axiosError.response.data.errors;
+          Object.entries(errors).forEach(([field, message]) => {
+            toast.error(`${field}: ${message}`);
+          });
+        } else if (axiosError.response?.data?.detail) {
+          toast.error(axiosError.response.data.detail);
+        } else if (error.message) {
+          toast.error(error.message);
         } else {
-          const axiosError = error as AxiosError<{ detail: string }>;
-          toast.error(
-            axiosError.response?.data?.detail ||
-              `An error occurred during sign-up. Status: ${axiosError.response?.status}`
-          );
+          toast.error(`An error occurred during sign-up. Status: ${axiosError.response?.status}`);
         }
-      } 
+      } else {
+        toast.error("An unexpected error occurred. Please try again.");
+      }
     },
   });
 
@@ -64,6 +69,17 @@ const SignUpPage = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
+    if (formData.password !== formData.confirm_password) {
+      toast.error("Passwords do not match.");
+      return;
+    }
+
+    if (formData.password.length < 8) {
+      toast.error("Password must be at least 8 characters long.");
+      return;
+    }
+
     signUpMutation.mutate(formData);
   };
 
@@ -81,6 +97,7 @@ const SignUpPage = () => {
             <Logo width={"180px"} className="md:w-[200px]" />
           </div>
           <form onSubmit={handleSubmit} className="w-full space-y-6">
+            {/* First Name input */}
             <div className="relative border border-lightMode-text-heading dark:border-darkMode-text-heading rounded-full py-1 px-4">
               <label
                 htmlFor="first_name"
@@ -99,6 +116,7 @@ const SignUpPage = () => {
                 onChange={handleInputChange}
               />
             </div>
+            {/* Last Name input */}
             <div className="relative border border-lightMode-text-heading dark:border-darkMode-text-heading rounded-full py-1 px-4">
               <label
                 htmlFor="last_name"
@@ -117,6 +135,7 @@ const SignUpPage = () => {
                 onChange={handleInputChange}
               />
             </div>
+            {/* Email input */}
             <div className="relative border border-lightMode-text-heading dark:border-darkMode-text-heading rounded-full py-1 px-4">
               <label
                 htmlFor="email"
@@ -135,6 +154,7 @@ const SignUpPage = () => {
                 onChange={handleInputChange}
               />
             </div>
+            {/* Password input */}
             <div className="relative border border-lightMode-text-heading dark:border-darkMode-text-heading rounded-full py-1 px-4">
               <label
                 htmlFor="password"
@@ -148,7 +168,7 @@ const SignUpPage = () => {
                 type={showPassword ? "text" : "password"}
                 required
                 className="px-0 py-2 w-full border-none text-xs text-lightMode-text-main dark:text-darkMode-text-main focus:outline-none transition-colors duration-300 bg-transparent autofill-fix"
-                placeholder="Enter Password"
+                placeholder="Enter Password (min. 8 characters)"
                 value={formData.password}
                 onChange={handleInputChange}
               />
@@ -164,42 +184,36 @@ const SignUpPage = () => {
                 )}
               </button>
             </div>
-            {/* <div className="relative border border-lightMode-text-heading dark:border-darkMode-text-heading rounded-full py-1 px-4">
+            {/* Confirm Password input */}
+            <div className="relative border border-lightMode-text-heading dark:border-darkMode-text-heading rounded-full py-1 px-4">
               <label
-                htmlFor="account_number"
+                htmlFor="confirm_password"
                 className="absolute -top-2 left-6 bg-lightMode-background-main dark:bg-darkMode-background-main px-2 text-xs font-medium text-lightMode-text-heading dark:text-darkMode-text-heading"
               >
-                Account Number
+                Confirm Password
               </label>
               <input
-                id="account_number"
-                name="account_number"
-                type="text"
+                id="confirm_password"
+                name="confirm_password"
+                type={showConfirmPassword ? "text" : "password"}
                 required
-                className="w-full border-none text-xs text-lightMode-text-main dark:text-darkMode-text-main focus:outline-none px-0 py-2 placeholder-gray-400 bg-transparent autofill-fix"
-                placeholder="Enter Account Number"
-                value={formData.account_number}
+                className="px-0 py-2 w-full border-none text-xs text-lightMode-text-main dark:text-darkMode-text-main focus:outline-none transition-colors duration-300 bg-transparent autofill-fix"
+                placeholder="Confirm Password"
+                value={formData.confirm_password}
                 onChange={handleInputChange}
               />
-            </div> */}
-            {/* <div className="relative border border-lightMode-text-heading dark:border-darkMode-text-heading rounded-full py-1 px-4">
-              <label
-                htmlFor="bank"
-                className="absolute -top-2 left-6 bg-lightMode-background-main dark:bg-darkMode-background-main px-2 text-xs font-medium text-lightMode-text-heading dark:text-darkMode-text-heading"
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-lightMode-text-main dark:text-darkMode-text-main transition-colors duration-300"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               >
-                Bank
-              </label>
-              <input
-                id="bank"
-                name="bank"
-                type="text"
-                required
-                className="w-full border-none text-xs text-lightMode-text-main dark:text-darkMode-text-main focus:outline-none px-0 py-2 placeholder-gray-400 bg-transparent autofill-fix"
-                placeholder="Enter Bank Name"
-                value={formData.bank}
-                onChange={handleInputChange}
-              />
-            </div> */}
+                {showConfirmPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
+            </div>
             <button
               type="submit"
               className="w-full h-[45px] md:h-[50px] bg-lightMode-button-background dark:bg-darkMode-button-background text-lightMode-button-text dark:text-darkMode-button-text py-2 px-4 rounded-full focus:outline-none transition-colors duration-300 text-base dark:hover:bg-darkMode-button-background/90 hover:bg-lightMode-button-background/90 disabled:opacity-40 flex items-center justify-center"
@@ -228,14 +242,9 @@ const SignUpPage = () => {
                 </svg>
               )}
               Sign Up
-            </button>{" "}
+            </button>
           </form>
-          {signUpMutation.isError && (
-            <p className="text-red-500 text-sm mt-2">
-              {(signUpMutation.error as Error).message ||
-                "An error occurred during sign-up."}
-            </p>
-          )}
+          
           <div className="w-full flex flex-col items-center gap-2 mt-4 md:mt-0">
             <div className="text-center text-sm text-lightMode-text-main dark:text-darkMode-text-main transition-colors duration-300">
               Already have an account?{" "}
