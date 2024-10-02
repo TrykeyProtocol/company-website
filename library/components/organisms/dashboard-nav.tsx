@@ -50,16 +50,16 @@ const NavLink: React.FC<NavItem & { isActive: boolean }> = ({
 );
 
 const TrykeySensors = () => (
-  <div className=" bg-black rounded-2xl py-6 px-8 gap-1.5 text-white flex flex-col items-center">
+  <div className=" bg-black rounded-2xl py-6 px-6 gap-1.5 text-white flex flex-col items-center">
     <Image
-      src="/images/logo/vector.svg"
+      src="/images/logo/management-kit.png"
       alt="User Avatar"
-      width={40}
-      height={40}
-      className=" w-[40px] h-[40px]"
+      width={120}
+      height={80}
+      // className=" w-[100px] h-[80px]"
     />
-    <h3 className="font-bold">Trykey Sensors</h3>
-    <p className="text-xs text-gray-400">Available at any mall/shop</p>
+    <h3 className="font-bold text-center">Trykey Management Kit</h3>
+    {/* <p className="text-xs text-gray-400">Available at any mall/shop</p> */}
     <button className="bg-white text-black font-semibold py-1.5 w-full rounded mt-2">
       Buy
     </button>
@@ -70,7 +70,7 @@ export const DashboardNavDesktop: React.FC = () => {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden lg:flex flex-col w-64 min-h-screen px-4 py-10 text-lightMode-text-heading dark:text-darkMode-text-heading border-r border-gray-200 dark:border-gray-800 bg-lightMode-background-main dark:bg-darkMode-background-main justify-between">
+    <aside className="hidden lg:flex flex-col w-64 h-screen px-4 py-10 text-lightMode-text-heading dark:text-darkMode-text-heading border-r border-gray-200 dark:border-gray-800 bg-lightMode-background-main dark:bg-darkMode-background-main justify-between">
       <div className=" flex flex-col">
         <Logo />
         <nav>
@@ -84,7 +84,7 @@ export const DashboardNavDesktop: React.FC = () => {
         </nav>
         <div>
           <Link
-            href="/logout"
+            href="/"
             className="flex gap-3  items-center text rounded-2xl px-4 font-semibold mt-10 text-lightMode-text-accent dark:text-darkMode-text-accent hover:text-lightMode-button-background/80 dark:hover:text-darkMode-button-background/80"
           >
             <div className="p-2.5 bg-lightMode-brand-accent/20 rounded-xl">

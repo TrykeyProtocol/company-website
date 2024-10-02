@@ -7,6 +7,17 @@ const axiosInstance = axios.create({
   },
 });
 
+const TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU5MzU0MjQzLCJpYXQiOjE3Mjc4MTgyNDMsImp0aSI6IjNlMzlmNzZiNmU4MzRjOWZiM2EwZTRiYjY3MzY1YzhiIiwidXNlcl9pZCI6MTF9.2MvwMMpNzRdBL57v-KfbArZLo2NBuBFSNOIdmpwoomU";
+
+export const axiosAuth = axios.create({
+  baseURL: 'https://dashboard.trykeyprotocol.com/api',
+  headers: {
+    'Authorization': `Bearer ${TOKEN}`,
+    'Content-Type': 'multipart/form-data',
+  }
+});
+
+
 // Request interceptor
 // axiosInstance.interceptors.request.use(
 //   (config) => {

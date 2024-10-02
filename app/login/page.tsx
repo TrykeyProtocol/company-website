@@ -30,7 +30,7 @@ const LoginPage = () => {
     onSuccess: (response) => {
       localStorage.setItem("token", response.data.access);
       toast.success("Login successful!");
-      router.push("/coming-soon");
+      router.push("/overview");
     },
     onError: (error: any) => {
       console.error("Login failed:", error);

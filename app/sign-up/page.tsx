@@ -39,7 +39,7 @@ const SignUpPage = () => {
     },
     onSuccess: () => {
       toast.success("Sign-up successful!");
-      router.push("/coming-soon");
+      router.push("/overview");
     },
     onError: (error: Error) => {
       if (axios.isAxiosError(error)) {
