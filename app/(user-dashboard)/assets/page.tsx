@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { MapPin, Users, Route, Phone, DollarSign, Power } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
@@ -13,9 +13,38 @@ import {
 } from "recharts";
 import { axiosAuth } from "@/library/api/axios";
 import { AxiosResponse } from "axios";
-import { Toaster, toast } from "react-hot-toast";
 
+import { Toaster, toast } from "react-hot-toast";
+import { useSpring, animated } from "react-spring";
 import { useQuery } from "@tanstack/react-query";
+
+const useSlowIncrementAnimation = (initialValue: number, maxIncrement: number = 10) => {
+  const [displayValue, setDisplayValue] = useState(initialValue);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    setDisplayValue(initialValue);
+    
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+
+    intervalRef.current = setInterval(() => {
+      setDisplayValue((prevValue) => {
+        const increment = Math.floor(Math.random() * (maxIncrement + 1));
+        return prevValue + increment;
+      });
+    }, 3000); // Update every second
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [initialValue, maxIncrement]);
+
+  return displayValue;
+};
 
 interface VehicleStatus {
   last_ignition_command: {
@@ -59,7 +88,7 @@ const Dashboard = () => {
     {
       id: 1,
       number: "APP-456CV",
-      image: "https://i.imgur.com/MHtMqlk.jpg",
+      image: "https://i.imgur.com/x0wMU0A.jpg",
       driver: "Chukwuma John",
       phoneNumber: "+234 800 123 4567",
       passengers: 3,
@@ -98,6 +127,8 @@ const Dashboard = () => {
   ];
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
   const [vehiclesState, setVehiclesState] = useState(vehicles);
+
+  const animatedYield = useSlowIncrementAnimation(selectedVehicle?.expectedYield || 0);
 
   const handleTurnOff = (id: number) => {
     setVehiclesState((prevState) =>
@@ -268,9 +299,9 @@ const Dashboard = () => {
             <div className="my-8 p-6 border border-gray-200 dark:border-gray-800 rounded-xl">
               <div>
                 <p>Expected Yield</p>
-                <p className="text-3xl font-bold text-blue-600">
-                  ₦{selectedVehicle.expectedYield.toLocaleString()}
-                </p>
+                  <p className="text-3xl font-bold text-blue-600">
+                    ₦{animatedYield.toLocaleString('en-US', {maximumFractionDigits: 0})}
+                  </p>
               </div>
               <div className="text-right text-sm">
                 <p>Based on:</p>
