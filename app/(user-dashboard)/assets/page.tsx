@@ -38,8 +38,7 @@ const Dashboard = () => {
     {
       id: 1,
       number: "APP-456CV",
-      image:
-        "https://imgur.com/MHtMqlk",
+      image: "https://i.imgur.com/MHtMqlk.jpg",
       driver: "Chukwuma John",
       phoneNumber: "+234 800 123 4567",
       passengers: 3,
@@ -52,8 +51,7 @@ const Dashboard = () => {
     {
       id: 2,
       number: "GWA-294-NV",
-      image:
-        "https://imgur.com/FsI0EhQ",
+      image: "https://i.imgur.com/FsI0EhQ.jpg",
       driver: "Abdullahi Musa",
       phoneNumber: "+234 800 987 6543",
       passengers: 2,
@@ -66,8 +64,7 @@ const Dashboard = () => {
     {
       id: 3,
       number: "FKJ-254XA",
-      image:
-        "https://imgur.com/o43NuRt",
+      image: "https://i.imgur.com/o43NuRt.jpg",
       driver: "Olawoyin Sadeeq",
       phoneNumber: "+234 800 456 7890",
       passengers: 4,
@@ -98,7 +95,7 @@ const Dashboard = () => {
         action_type: "ignition",
       }),
     onSuccess: (data, vehicle) => {
-      toast.success("Success: Vehicle state toggled");
+      alert("Success: Vehicle state toggled");
       queryClient.invalidateQueries({ queryKey: ["vehicles"] });
     },
     onError: (error) => {
@@ -133,10 +130,8 @@ const Dashboard = () => {
             {vehiclesState.map((vehicle) => (
               <div
                 key={vehicle.id}
-                className={` rounded-2xl shadow-2xl shadow-[#4c67641f] overflow-hidden cursor-pointer transform transition-all duration-300 hover:scale-105 bg-lightMode-background-main dark:bg-darkMode-background-main ${
-                  selectedVehicle?.id === vehicle.id
-                    ? "ring-2 ring-blue-500"
-                    : ""
+                className={`rounded-2xl shadow-2xl shadow-[#4c67641f] overflow-hidden cursor-pointer transform transition-all duration-300 hover:scale-105 bg-lightMode-background-main dark:bg-darkMode-background-main ${
+                  selectedVehicle?.id === vehicle.id ? "ring-2 ring-blue-500" : ""
                 }`}
                 onClick={() => setSelectedVehicle(vehicle)}
               >
@@ -145,16 +140,18 @@ const Dashboard = () => {
                   alt={vehicle.number}
                   className="w-full h-48 object-cover"
                 /> */}
-                      <Image
-        src={vehicle.image}
-        alt={vehicle.number}
-        width={40}
-        height={48}
-        className="w-full h-48 object-cover"
-      />
+                <div className="relative w-full h-48">
+                  <Image
+                    src={vehicle.image}
+                    alt={vehicle.number}
+                    layout="fill"
+                    objectFit="cover"
+                    priority
+                  />
+                </div>
                 <div className="p-4">
                   <h2 className="text-xl font-semibold">{vehicle.number}</h2>
-                  <p className=" text-lightMode-text-main dark:text-darkMode-text-main text-sm">
+                  <p className="text-lightMode-text-main dark:text-darkMode-text-main text-sm">
                     {vehicle.driver}
                   </p>
                   <p
