@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import { axiosAuth } from "@/library/api/axios";
 import { AxiosResponse } from "axios";
+import { Toaster, toast } from "react-hot-toast";
 
 export interface Vehicle {
   id: number;
@@ -38,7 +39,7 @@ const Dashboard = () => {
       id: 1,
       number: "APP-456CV",
       image:
-        "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80",
+        "https://imgur.com/MHtMqlk",
       driver: "Chukwuma John",
       phoneNumber: "+234 800 123 4567",
       passengers: 3,
@@ -52,7 +53,7 @@ const Dashboard = () => {
       id: 2,
       number: "GWA-294-NV",
       image:
-        "https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80",
+        "https://imgur.com/FsI0EhQ",
       driver: "Abdullahi Musa",
       phoneNumber: "+234 800 987 6543",
       passengers: 2,
@@ -66,7 +67,7 @@ const Dashboard = () => {
       id: 3,
       number: "FKJ-254XA",
       image:
-        "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80",
+        "https://imgur.com/o43NuRt",
       driver: "Olawoyin Sadeeq",
       phoneNumber: "+234 800 456 7890",
       passengers: 4,
@@ -97,7 +98,7 @@ const Dashboard = () => {
         action_type: "ignition",
       }),
     onSuccess: (data, vehicle) => {
-      alert("Success: Vehicle state toggled");
+      toast.success("Success: Vehicle state toggled");
       queryClient.invalidateQueries({ queryKey: ["vehicles"] });
     },
     onError: (error) => {
@@ -116,7 +117,7 @@ const Dashboard = () => {
       <div className=" md:flex gap-8 items-start">
         <div className=" lg:w-2/3">
           {/* Revenue Chart */}
-          <div className="mb-12 rounded-3xl shadow-2xl shadow-[#4c67641f] p-6 h-80 bg-lightMode-background-main dark:bg-darkMode-background-main">
+          {/* <div className="mb-12 rounded-3xl shadow-2xl shadow-[#4c67641f] p-6 h-80 bg-lightMode-background-main dark:bg-darkMode-background-main">
             <h2 className="text-2xl font-bold mb-4">Total Revenue Overview</h2>
             <ResponsiveContainer width="100%" height="80%">
               <BarChart data={vehiclesState}>
@@ -126,7 +127,7 @@ const Dashboard = () => {
                 <Bar dataKey="totalRevenue" fill="#3B82F6" />
               </BarChart>
             </ResponsiveContainer>
-          </div>
+          </div> */}
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {vehiclesState.map((vehicle) => (
