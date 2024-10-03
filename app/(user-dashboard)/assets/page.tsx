@@ -15,6 +15,27 @@ import { axiosAuth } from "@/library/api/axios";
 import { AxiosResponse } from "axios";
 import { Toaster, toast } from "react-hot-toast";
 
+import { useQuery } from "@tanstack/react-query";
+
+interface VehicleStatus {
+  last_ignition_command: {
+    command: string;
+    timestamp: string;
+  };
+  last_passenger_count: {
+    count: string;
+    timestamp: string;
+  };
+  last_location: {
+    location: string;
+    timestamp: string;
+  };
+  total_distance: {
+    value: number;
+    unit: string;
+  };
+}
+
 export interface Vehicle {
   id: number;
   number: string;
@@ -88,26 +109,31 @@ const Dashboard = () => {
 
   const queryClient = useQueryClient();
 
+  const { data: vehicleStatus, isLoading: isStatusLoading } = useQuery<VehicleStatus>({
+    queryKey: ['vehicleStatus'],
+    queryFn: () => axiosAuth.get('https://dashboard.trykeyprotocol.com/api/assets/AMS1120/status/999/').then(res => res.data),
+    refetchInterval: 30000, // Refetch every 30 seconds
+  });
+
   const toggleVehicleMutation = useMutation({
     mutationFn: (vehicle: Vehicle) =>
-      axiosAuth.post(`/assets/AMS1120/control/999/`, {
+      axiosAuth.post('https://dashboard.trykeyprotocol.com/api/assets/AMS1120/control/999/', {
         data: vehicle.isOn ? "turn_off" : "turn_on",
         action_type: "ignition",
       }),
     onSuccess: (data, vehicle) => {
-    toast.success("Vehicle state toggled successfully");
-    const updatedVehicles = vehiclesState.map((v) =>
-      v.id === vehicle.id ? { ...v, isOn: !v.isOn } : v
-    );
-    setVehiclesState(updatedVehicles);
-    
-    // Update selectedVehicle if it's the one that was toggled
-    if (selectedVehicle && selectedVehicle.id === vehicle.id) {
-      setSelectedVehicle({ ...selectedVehicle, isOn: !selectedVehicle.isOn });
-    }
-    
-    queryClient.invalidateQueries({ queryKey: ["vehicles"] });
-  },
+      toast.success("Vehicle state toggled successfully");
+      const updatedVehicles = vehiclesState.map((v) =>
+        v.id === vehicle.id ? { ...v, isOn: !v.isOn } : v
+      );
+      setVehiclesState(updatedVehicles);
+      
+      if (selectedVehicle && selectedVehicle.id === vehicle.id) {
+        setSelectedVehicle({ ...selectedVehicle, isOn: !selectedVehicle.isOn });
+      }
+      
+      queryClient.invalidateQueries({ queryKey: ["vehicles", "vehicleStatus"] });
+    },
     onError: (error) => {
       toast.error("Failed to toggle vehicle state");
       console.error("Failed to toggle vehicle state:", error);
@@ -151,12 +177,13 @@ const Dashboard = () => {
                   alt={vehicle.number}
                   className="w-full h-48 object-cover"
                 /> */}
-                <div className="relative w-full h-48">
+                <div className="relative w-48 h-48">
                   <Image
                     src={vehicle.image}
                     alt={vehicle.number}
                     layout="fill"
                     objectFit="cover"
+                    className="rounded-t-2xl" 
                     priority
                   />
                 </div>
@@ -246,46 +273,62 @@ const Dashboard = () => {
                 </p>
               </div>
               <div className="text-right text-sm">
-                <p>Based on</p>
-                <p className=" font-semibold">
-                  {selectedVehicle.distanceTravelled} km travelled
-                </p>
-                <p className=" font-semibold">
-                  {selectedVehicle.passengers} passengers
-                </p>
+                <p>Based on:</p>
+                  <p className="font-normal">
+                    {isStatusLoading ? (
+                      "Loading..."
+                    ) : (
+                      <>
+                        <span className="font-bold">{vehicleStatus?.total_distance.value.toFixed(2)}</span>{' '}
+                        <span className="font-bold">{vehicleStatus?.total_distance.unit}</span> travelled
+                      </>
+                    )}
+                  </p>
+                  <p className="font-normal">
+                    {isStatusLoading ? (
+                      "Loading..."
+                    ) : (
+                      <>
+                        <span className="font-bold">{vehicleStatus?.last_passenger_count.count}</span> passengers
+                      </>
+                    )}
+                  </p>
               </div>
             </div>
 
-            <div className=" flex flex-col gap-3">
+            <div className="flex flex-col gap-3">
               <div className="flex items-center mb-3">
                 <Users className="max-w-6 w-full h-6 text-blue-500 mr-2" />
-                <span className=" align-middle inline-block">
-                  <span className=" text-sm">Passengers:</span>{" "}
-                  <span className=" font-semibold">
-                    {selectedVehicle.passengers}
+                <span className="align-middle inline-block">
+                  <span className="text-sm">Passengers:</span>{" "}
+                  <span className="font-semibold">
+                    {isStatusLoading ? "Loading..." : vehicleStatus?.last_passenger_count.count}
                   </span>
                 </span>
               </div>
 
               <div className="flex items-center mb-3">
-                <MapPin className=" max-w-6 w-full h-6 text-green-500 mr-2" />
-                <span className=" align-middle inline-block">
+                <MapPin className="max-w-6 w-full h-6 text-green-500 mr-2" />
+                <span className="align-middle inline-block">
                   <span className="text-sm">Current Location:</span>{" "}
                   <span className="font-semibold">
-                    {selectedVehicle.location}
+                    {isStatusLoading ? "Loading..." : vehicleStatus?.last_location.location}
                   </span>
                 </span>
               </div>
 
               <div className="flex items-center mb-3">
                 <Route className="max-w-6 w-full h-6 text-purple-500 mr-2" />
-                <span className=" align-middle inline-block">
-                  <span className=" text-sm">Distance Travelled:</span>{" "}
-                  <span className=" font-semibold">
-                    {selectedVehicle.distanceTravelled} km
+                <span className="align-middle inline-block">
+                  <span className="text-sm">Distance Travelled:</span>{" "}
+                  <span className="font-semibold">
+                    {isStatusLoading 
+                      ? "Loading..." 
+                      : `${vehicleStatus?.total_distance.value.toFixed(2)} ${vehicleStatus?.total_distance.unit}`}
                   </span>
                 </span>
               </div>
+
               <div className="flex items-center mb-3">
                 <Users className="max-w-6 w-full h-6 text-orange-500 mr-2" />
                 <span className=" align-middle inline-block">
