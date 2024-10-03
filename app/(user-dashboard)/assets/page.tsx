@@ -143,7 +143,7 @@ const Dashboard = () => {
   const { data: vehicleStatus, isLoading: isStatusLoading } = useQuery<VehicleStatus>({
     queryKey: ['vehicleStatus'],
     queryFn: () => axiosAuth.get('https://dashboard.trykeyprotocol.com/api/assets/AMS1120/status/999/').then(res => res.data),
-    refetchInterval: 30000, // Refetch every 30 seconds
+    refetchInterval: 3000, // Refetch every 3 seconds
   });
 
   const toggleVehicleMutation = useMutation({
