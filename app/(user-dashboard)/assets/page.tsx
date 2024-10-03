@@ -95,11 +95,21 @@ const Dashboard = () => {
         action_type: "ignition",
       }),
     onSuccess: (data, vehicle) => {
-      alert("Success: Vehicle state toggled");
-      queryClient.invalidateQueries({ queryKey: ["vehicles"] });
-    },
+    toast.success("Vehicle state toggled successfully");
+    const updatedVehicles = vehiclesState.map((v) =>
+      v.id === vehicle.id ? { ...v, isOn: !v.isOn } : v
+    );
+    setVehiclesState(updatedVehicles);
+    
+    // Update selectedVehicle if it's the one that was toggled
+    if (selectedVehicle && selectedVehicle.id === vehicle.id) {
+      setSelectedVehicle({ ...selectedVehicle, isOn: !selectedVehicle.isOn });
+    }
+    
+    queryClient.invalidateQueries({ queryKey: ["vehicles"] });
+  },
     onError: (error) => {
-      alert("Error: Failed to toggle vehicle state");
+      toast.error("Failed to toggle vehicle state");
       console.error("Failed to toggle vehicle state:", error);
     },
   });
@@ -110,6 +120,7 @@ const Dashboard = () => {
 
   return (
     <div className="p-8 ">
+      <Toaster position="top-right" />
       <h1 className="text-4xl font-bold mb-4">Fleet Dashboard</h1>
       <div className=" md:flex gap-8 items-start">
         <div className=" lg:w-2/3">
@@ -172,21 +183,20 @@ const Dashboard = () => {
         {selectedVehicle ? (
           <div className=" rounded-3xl shadow-2xl shadow-[#4c67641f] p-8 bg-lightMode-background-main dark:bg-darkMode-background-main lg:w-1/3 border border-gray-200 dark:border-gray-800">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold ">
-                {selectedVehicle.number} Details
+              <h2 className="text-xl ">
+                <span className="font-bold ">{selectedVehicle.number}</span> Details
               </h2>
 
               <button
                 // onClick={() => handleTurnOff(selectedVehicle.id)}
                 onClick={() => handleToggleVehicle(selectedVehicle)}
-                className={`flex items-center gap-2`}
-                disabled={!selectedVehicle.isOn}
+                className="flex items-center gap-2"
               >
                 <div
                   className={`p-2.5 rounded-xl ${
                     selectedVehicle.isOn
                       ? "bg-red-500/20 hover:bg-red-600/20"
-                      : "bg-green-500/20 hover:bg-green-600/20 "
+                      : "bg-green-500/20 hover:bg-green-600/20"
                   }`}
                 >
                   {toggleVehicleMutation.isPending ? (
@@ -211,24 +221,19 @@ const Dashboard = () => {
                       ></path>
                     </svg>
                   ) : (
-                    <>
-                      <Power width={20} height={20} className={` ${
-                    selectedVehicle.isOn
-                      ? "text-red-400"
-                      : "text-green-500 "
-                  }`} />
-                    </>
+                    <Power
+                      width={20}
+                      height={20}
+                      className={selectedVehicle.isOn ? "text-red-400" : "text-green-500"}
+                    />
                   )}
                 </div>
-
                 <p
-                  className={` font-semibold text-sm ${
-                    selectedVehicle.isOn
-                      ? "text-red-400"
-                      : "text-green-500 "
+                  className={`font-semibold text-sm ${
+                    selectedVehicle.isOn ? "text-red-400" : "text-green-500"
                   }`}
                 >
-                  {selectedVehicle.isOn ? "Turn Off" : "Turn On"} 
+                  {selectedVehicle.isOn ? "Turn Off" : "Turn On"}
                 </p>
               </button>
             </div>
