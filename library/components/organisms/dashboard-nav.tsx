@@ -38,9 +38,9 @@ const NavLink: React.FC<NavItem & { isActive: boolean }> = ({
 }) => (
   <Link
     href={href}
-    className={`flex gap-3 items-center text rounded-2xl px-4 ${
+    className={`flex gap-3 items-center text rounded-2xl px-6 ${
       isActive
-        ? "font-semibold py-6 text-lightMode-text-accent dark:text-darkMode-text-accent bg-lightMode-button-background/10 dark:bg-darkMode-button-background/10"
+        ? "font-semibold py-4 text-lightMode-text-accent dark:text-darkMode-text-accent bg-lightMode-button-background/10 dark:bg-darkMode-button-background/10"
         : "text-lightMode-text-main dark:text-darkMode-text-main hover:text-lightMode-button-background/80 dark:hover:text-darkMode-button-background/80"
     }`}
   >

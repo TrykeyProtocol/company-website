@@ -33,9 +33,9 @@ const Dashboard = () => {
           <div className="bg-lightMode-background-main dark:bg-darkMode-background-main p-6 rounded-3xl shadow-2xl shadow-[#4c67641f] mb-6">
             <div className=" flex justify-between mb-8 items-center">
               <div>
-                <h2 className="text-xl font-semibold">Assets Overview</h2>
+                <h2 className="text-xl font-semibold">Overview</h2>
                 <p className=" text-lightMode-text-main dark:text-darkMode-text-main text-sm mt-3">
-                  Monitor and Track your assets
+                Summary of your performing assets
                 </p>
               </div>
               <button className=" py-2.5 px-4 rounded-lg border border-lightMode-text-main flex items-center gap-2">
@@ -43,6 +43,7 @@ const Dashboard = () => {
                 <p>Export</p>
               </button>
             </div>
+            
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-purple-100 dark:bg-purple-500 p-4 rounded-3xl flex flex-col items-start border-l-[4px] border-purple-500 dark:border-purple-900">
                 <div className=" p-3 rounded-full bg-purple-500 dark:bg-purple-700 mb-3">
