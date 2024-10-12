@@ -1,13 +1,13 @@
 import axios from 'axios';
 
-const axiosInstance = axios.create({
+export const axiosInstance = axios.create({
   baseURL: 'https://dashboard.trykeyprotocol.com/api',
   headers: {
     'Content-Type': 'multipart/form-data',
   },
 });
 
-const TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU5MzU0MjQzLCJpYXQiOjE3Mjc4MTgyNDMsImp0aSI6IjNlMzlmNzZiNmU4MzRjOWZiM2EwZTRiYjY3MzY1YzhiIiwidXNlcl9pZCI6MTF9.2MvwMMpNzRdBL57v-KfbArZLo2NBuBFSNOIdmpwoomU";
+const TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYwMDY0NzY1LCJpYXQiOjE3Mjg1Mjg3NjUsImp0aSI6IjFiMWY2ZWExMmQ3MzRhMjM5OWQyYzYwMDQyMjJlYjY5IiwidXNlcl9pZCI6MX0.p8XsvM_EuFlTqaEGwdGB9wWUDKI17lZvyCj8-TfDdLs";
 
 export const axiosAuth = axios.create({
   baseURL: 'https://dashboard.trykeyprotocol.com/api',
@@ -43,4 +43,3 @@ export const axiosAuth = axios.create({
 //   }
 // );
 
-export default axiosInstance;

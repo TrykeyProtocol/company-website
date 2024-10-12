@@ -8,11 +8,26 @@ import {
   WalletCards,
 } from "lucide-react";
 import { GaugeChart } from "@/library/components/organisms/goal-chart";
+import { useQuery } from "@tanstack/react-query";
+import { axiosAuth } from "@/library/api/axios";
 
 interface Category {
   name: string;
   amount: number;
   color: string;
+}
+
+interface Asset {
+  asset_number: string;
+  asset_type: string;
+  asset_name: string;
+  location: string;
+  total_revenue: string;
+  details: string;
+  account_number: string;
+  bank: string;
+  user_role: string;
+  sub_asset_count: number;
 }
 
 const Dashboard = () => {
@@ -24,6 +39,14 @@ const Dashboard = () => {
     { name: "Medical", amount: 5000, color: "bg-green-500" },
     { name: "Agriculture", amount: 5000, color: "bg-blue-400" },
   ];
+
+  const { data: assets, isLoading: assetsLoading, isError: assetsError } = useQuery<Asset[], Error>({
+    queryKey: ["assets"],
+    queryFn: async () => {
+      const { data } = await axiosAuth.get<Asset[]>("/assets/");
+      return data;
+    },
+  });
 
   return (
     <div>
@@ -54,7 +77,7 @@ const Dashboard = () => {
                     strokeWidth={2.5}
                   />
                 </div>
-                <p className="text-2xl font-bold">4</p>
+                <p className="text-2xl font-bold">{assets?.length}</p>
                 <p className="text-sm text-lightMode-text-main dark:text-darkMode-text-heading">
                   Total assets
                 </p>
@@ -100,7 +123,7 @@ const Dashboard = () => {
 
         {/* second screen */}
         <div className=" w-full md:w-1/4 container mx-auto flex flex-col gap-8 p-4 md:p-0">
-          <div className="bg-lightMode-background-main dark:bg-darkMode-background-main p-6 rounded-bl-3xl w-full h-[40vh] border-b border-l border-gray-200 dark:border-gray-800  hidden md:flex flex-col">
+          {/* <div className="bg-lightMode-background-main dark:bg-darkMode-background-main p-6 rounded-bl-3xl w-full h-[40vh] border-b border-l border-gray-200 dark:border-gray-800  hidden md:flex flex-col">
             <h2 className="text-xl font-semibold mb-4 flex gap-2 items-center">
               <>Notifications</>{" "}
               <Bell
@@ -112,16 +135,16 @@ const Dashboard = () => {
             <p className=" text-sm text-lightMode-text-main dark:text-darkMode-text-main">
               Nothing to show
             </p>
-          </div>
+          </div> */}
 
           {/* graph here */}
-          <div className=" w-full rounded-3xl md:rounded-r-none bg-lightMode-background-main dark:bg-darkMode-background-main p-6 border border-gray-200 dark:border-gray-800">
+          {/* <div className=" w-full rounded-3xl md:rounded-r-none bg-lightMode-background-main dark:bg-darkMode-background-main p-6 border border-gray-200 dark:border-gray-800">
             <GaugeChart
               goal={goalAmount}
               current={currentAmount}
               categories={categories}
             />
-          </div>
+          </div> */}
         </div>
       </main>
     </div>

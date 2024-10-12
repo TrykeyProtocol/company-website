@@ -1,6 +1,8 @@
 "use client";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { axiosAuth } from "@/library/api/axios";
 import {
   DashboardNavDesktop,
   DashboardNavMobile,
@@ -9,12 +11,45 @@ import { ThemeSwitch } from "../atoms/theme-switch";
 import { Bell, Menu } from "lucide-react";
 import Notification from "../organisms/notification";
 
+interface UserData {
+  first_name: string;
+  last_name: string;
+  email: string;
+  account_number: string;
+  bank: string;
+  avatar: string;
+}
+
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const toggleNotification = () => setIsNotificationOpen(!isNotificationOpen);
+
+  const { data: userData, isLoading, isError } = useQuery<UserData, Error>({
+    queryKey: ["userData"],
+    queryFn: async () => {
+      const { data } = await axiosAuth.get<UserData>("/auth/me/");
+      return data;
+    },
+  });
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 18) return "Good afternoon";
+    return "Good evening";
+  };
+
+  const formatDate = () => {
+    return new Date().toLocaleDateString('en-GB', { 
+      weekday: 'long', 
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric' 
+    });
+  };
 
   return (
     <div className="flex h-screen bg-lightMode-background-alternate dark:bg-darkMode-background-alternate text-lightMode-text-heading dark:text-darkMode-text-heading">
@@ -29,23 +64,29 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         {/* Header */}
         <header className="bg-lightMode-background-main dark:bg-darkMode-background-main border-b border-gray-200 dark:border-gray-800 z-10">
           <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-            <div className="flex gap-5 items-center">
-              <Image
-                src="/images/dashboard/pfp.png"
-                alt="User Avatar"
-                width={60}
-                height={60}
-                className="rounded-full w-[40px] h-[40px] md:w-[60px] md:h-[60px]"
-              />
-              <div>
-                <p className="mr-2 text-lightMode-text-heading dark:text-darkMode-text-heading font-semibold">
-                  Good evening, Olu
-                </p>
-                <p className="text-xs mt-1 text-lightMode-text-main dark:text-darkMode-text-main">
-                  Thursday, 26-09-2024
-                </p>
+            {isLoading ? (
+              <div>Loading...</div>
+            ) : isError ? (
+              <div>Error loading user data</div>
+            ) : userData ? (
+              <div className="flex gap-5 items-center">
+                <Image
+                  src={userData.avatar}
+                  alt="User Avatar"
+                  width={60}
+                  height={60}
+                  className="rounded-full w-[40px] h-[40px] md:w-[60px] md:h-[60px]"
+                />
+                <div>
+                  <p className="mr-2 text-lightMode-text-heading dark:text-darkMode-text-heading font-semibold">
+                    {getGreeting()}, {userData.first_name}
+                  </p>
+                  <p className="text-xs mt-1 text-lightMode-text-main dark:text-darkMode-text-main">
+                    {formatDate()}
+                  </p>
+                </div>
               </div>
-            </div>
+            ) : null}
             <div className="flex items-center space-x-4">
               <ThemeSwitch />
               <button

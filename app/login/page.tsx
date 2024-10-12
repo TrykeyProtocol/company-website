@@ -8,7 +8,7 @@ import { SiGoogle } from "@icons-pack/react-simple-icons";
 import { useMutation } from "@tanstack/react-query";
 import { Toaster, toast } from "react-hot-toast";
 import { CustomToaster } from "@/library/components/atoms/custom-toaster";
-import axiosInstance from "@/library/api/axios";
+import { axiosInstance } from "@/library/api/axios";
 
 interface LoginData {
   username: string;
@@ -38,8 +38,7 @@ const LoginPage = () => {
         error.response?.data?.detail || "An error occurred during login."
       );
     },
-    onSettled: () => {
-    },
+    onSettled: () => {},
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

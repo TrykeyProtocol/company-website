@@ -9,7 +9,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Toaster, toast } from "react-hot-toast";
 import { CustomToaster } from "@/library/components/atoms/custom-toaster";
 import axios, { AxiosError } from "axios";
-import axiosInstance from "@/library/api/axios";
+import { axiosInstance } from "@/library/api/axios";
 
 interface SignUpData {
   first_name: string;
@@ -43,7 +43,7 @@ const SignUpPage = () => {
     },
     onError: (error: Error) => {
       if (axios.isAxiosError(error)) {
-        const axiosError = error ;
+        const axiosError = error;
         if (axiosError.response?.data?.errors) {
           const errors = axiosError.response.data.errors;
           Object.entries(errors).forEach(([field, message]) => {
@@ -54,7 +54,9 @@ const SignUpPage = () => {
         } else if (error.message) {
           toast.error(error.message);
         } else {
-          toast.error(`An error occurred during sign-up. Status: ${axiosError.response?.status}`);
+          toast.error(
+            `An error occurred during sign-up. Status: ${axiosError.response?.status}`
+          );
         }
       } else {
         toast.error("An unexpected error occurred. Please try again.");
@@ -69,7 +71,7 @@ const SignUpPage = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     if (formData.password !== formData.confirm_password) {
       toast.error("Passwords do not match.");
       return;
@@ -244,7 +246,7 @@ const SignUpPage = () => {
               Sign Up
             </button>
           </form>
-          
+
           <div className="w-full flex flex-col items-center gap-2 mt-4 md:mt-0">
             <div className="text-center text-sm text-lightMode-text-main dark:text-darkMode-text-main transition-colors duration-300">
               Already have an account?{" "}
