@@ -10,7 +10,7 @@ import {
 import { ThemeSwitch } from "../atoms/theme-switch";
 import { Bell, Menu } from "lucide-react";
 import Notification from "../organisms/notification";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 
 interface UserData {
   first_name: string;
@@ -25,14 +25,16 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-
+  const [isCheckingToken, setIsCheckingToken] = useState(true);
 
   useEffect(() => {
     const checkToken = () => {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (!token) {
-        router.push('/login'); // Adjust this path to match your login route
-      } 
+        router.push("/login");
+      } else {
+        setIsCheckingToken(false);
+      }
     };
 
     checkToken();
@@ -41,12 +43,17 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const toggleNotification = () => setIsNotificationOpen(!isNotificationOpen);
 
-  const { data: userData, isLoading, isError } = useQuery<UserData, Error>({
+  const {
+    data: userData,
+    isLoading,
+    isError,
+  } = useQuery<UserData, Error>({
     queryKey: ["userData"],
     queryFn: async () => {
       const { data } = await axiosAuth.get<UserData>("/auth/me/");
       return data;
     },
+    enabled: !isCheckingToken, // Only run the query after token check
   });
 
   const getGreeting = () => {
@@ -57,13 +64,17 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   };
 
   const formatDate = () => {
-    return new Date().toLocaleDateString('en-GB', { 
-      weekday: 'long', 
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric' 
+    return new Date().toLocaleDateString("en-GB", {
+      weekday: "long",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
     });
   };
+
+  if (isCheckingToken) {
+    return <div>Loading...</div>; // Or a more sophisticated loading component
+  }
 
   return (
     <div className="flex h-screen bg-lightMode-background-alternate dark:bg-darkMode-background-alternate text-lightMode-text-heading dark:text-darkMode-text-heading">
@@ -115,13 +126,11 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
             </div>
           </div>
         </header>
-        
+
         {/* Scrollable content area */}
-        <main className="flex-1 overflow-y-auto">
-          {children}
-        </main>
+        <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
-      
+
       {/* Notification panel */}
       {isNotificationOpen && (
         <Notification
