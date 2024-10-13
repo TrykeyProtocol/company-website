@@ -14,6 +14,7 @@ import {
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 interface NavItem {
   name: string;
@@ -49,6 +50,14 @@ const NavLink: React.FC<NavItem & { isActive: boolean }> = ({
   </Link>
 );
 
+const handleLogout = (router: ReturnType<typeof useRouter>) => {
+  // Remove the token from localStorage
+  localStorage.removeItem("token");
+
+  // Redirect to the login page
+  router.push("/login");
+};
+
 const TrykeySensors = () => (
   <div className=" bg-black rounded-2xl py-6 px-6 gap-1.5 text-white flex flex-col items-center">
     <Image
@@ -68,6 +77,7 @@ const TrykeySensors = () => (
 
 export const DashboardNavDesktop: React.FC = () => {
   const pathname = usePathname();
+  const router = useRouter();
 
   return (
     <aside className="hidden lg:flex flex-col w-64 h-screen px-4 py-10 text-lightMode-text-heading dark:text-darkMode-text-heading border-r border-gray-200 dark:border-gray-800 bg-lightMode-background-main dark:bg-darkMode-background-main justify-between">
@@ -83,15 +93,15 @@ export const DashboardNavDesktop: React.FC = () => {
           </ul>
         </nav>
         <div>
-          <Link
-            href="/"
+          <button
+            onClick={() => handleLogout(router)}
             className="flex gap-3  items-center text rounded-2xl px-4 font-semibold mt-10 text-lightMode-text-accent dark:text-darkMode-text-accent hover:text-lightMode-button-background/80 dark:hover:text-darkMode-button-background/80"
           >
             <div className="p-2.5 bg-lightMode-brand-accent/20 rounded-xl">
               <LogOut width={20} height={20} strokeWidth={2} />
             </div>
             <p>Logout</p>
-          </Link>
+          </button>
         </div>
       </div>
 
@@ -105,6 +115,7 @@ export const DashboardNavMobile: React.FC<{
   setIsSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }> = ({ isSidebarOpen, setIsSidebarOpen }) => {
   const pathname = usePathname();
+  const router = useRouter();
 
   if (!isSidebarOpen) return null;
 
@@ -132,15 +143,18 @@ export const DashboardNavMobile: React.FC<{
             </ul>
           </nav>
           <div className="">
-            <Link
-              href="/logout"
+            <button
+              onClick={() => {
+                handleLogout(router);
+                setIsSidebarOpen(false);
+              }}
               className="flex gap-3 items-center text rounded-2xl px-4 font-semibold py-6 text-lightMode-text-accent dark:text-darkMode-text-accent hover:text-lightMode-button-background/80 dark:hover:text-darkMode-button-background/80"
             >
               <div className="p-2.5 bg-lightMode-brand-accent/20 rounded-xl">
                 <LogOut width={20} height={20} strokeWidth={2} />
               </div>
               <p>Logout</p>
-            </Link>
+            </button>
           </div>
         </div>
 

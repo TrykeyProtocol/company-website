@@ -10,6 +10,7 @@ import {
 import { ThemeSwitch } from "../atoms/theme-switch";
 import { Bell, Menu } from "lucide-react";
 import Notification from "../organisms/notification";
+import { useRouter } from 'next/navigation';
 
 interface UserData {
   first_name: string;
@@ -21,8 +22,21 @@ interface UserData {
 }
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
+  const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+
+
+  useEffect(() => {
+    const checkToken = () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        router.push('/login'); // Adjust this path to match your login route
+      } 
+    };
+
+    checkToken();
+  }, [router]);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const toggleNotification = () => setIsNotificationOpen(!isNotificationOpen);
@@ -71,7 +85,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
             ) : userData ? (
               <div className="flex gap-5 items-center">
                 <Image
-                  src={userData.avatar}
+                  src={"/images/dashboard/avatar.jpg"}
                   alt="User Avatar"
                   width={60}
                   height={60}

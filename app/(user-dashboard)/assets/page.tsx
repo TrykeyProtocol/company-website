@@ -1,40 +1,66 @@
 "use client";
 import { axiosAuth } from "@/library/api/axios";
-import AssetCard from "@/library/components/molecules/asset-card";
-import { useQuery } from "@tanstack/react-query";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { CustomToaster } from "@/library/components/atoms/custom-toaster";
+import AddAssetForm from "@/library/components/organisms/add-asset-form";
+import AssetList from "@/library/components/organisms/asset-list";
+import AssetModal from "@/library/components/organisms/asset-modal";
+import AssetPagination from "@/library/components/organisms/asset-pagination";
+import { Asset, AssetFormData, AssetsResponse } from "@/library/types/type";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-
-interface Asset {
-  asset_number: string;
-  asset_type: string;
-  asset_name: string;
-  location: string;
-  created_at: string;
-  total_revenue: string;
-  details: string;
-  account_number: string;
-  bank: string;
-  user_role: string;
-  sub_asset_count: number;
-}
-
-type AssetsResponse = Asset[];
+import toast from "react-hot-toast";
 
 const Page = () => {
   const [isLargeScreen, setIsLargeScreen] = useState(true);
   const [currentPage, setCurrentPage] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formData, setFormData] = useState<AssetFormData>({
+    asset_type: "vehicle",
+    asset_name: "",
+    location: "",
+    details: "",
+    account_number: "",
+    bank: "",
+  });
 
-  // Fetch assets using React Query
+  const queryClient = useQueryClient();
+
   const {
     data: assets,
     isLoading,
     isError,
-  } = useQuery<AssetsResponse, Error>({
+  } = useQuery<Asset[], Error>({
     queryKey: ["assets"],
     queryFn: async () => {
-      const { data } = await axiosAuth.get<AssetsResponse>("/assets/");
+      const { data } = await axiosAuth.get<Asset[]>("/assets/");
       return data;
+    },
+  });
+
+  const addAssetMutation = useMutation({
+    mutationFn: async (newAsset: AssetFormData) => {
+      const { data } = await axiosAuth.post<AssetsResponse>(
+        "/assets/",
+        newAsset
+      );
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["assets"] });
+      setIsModalOpen(false);
+      toast.success("Asset added successfully!");
+      setFormData({
+        asset_type: "vehicle",
+        asset_name: "",
+        location: "",
+        details: "",
+        account_number: "",
+        bank: "",
+      });
+    },
+    onError: (error) => {
+      console.error("Error adding asset:", error);
+      toast.error("Failed to add asset. Please try again.");
     },
   });
 
@@ -62,6 +88,20 @@ const Page = () => {
     setCurrentPage((prev) => Math.min(pageCount - 1, prev + 1));
   };
 
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    addAssetMutation.mutate(formData);
+  };
+
   const displayedAssets = Array.isArray(assets)
     ? isLargeScreen
       ? assets.slice(
@@ -76,6 +116,8 @@ const Page = () => {
 
   return (
     <div className="bg-lightMode-background-main dark:bg-darkMode-background-main p-6 rounded-3xl shadow-2xl shadow-[#4c67641f] mt-12 mx-8">
+      <CustomToaster />
+
       <div className="flex justify-between mb-8 items-center">
         <div>
           <h2 className="text-xl font-semibold">Assets Overview</h2>
@@ -83,50 +125,36 @@ const Page = () => {
             Monitor and Track your assets
           </p>
         </div>
-        <button className="py-2.5 px-4 rounded-lg border border-lightMode-text-main flex items-center gap-2">
-          <p>Add Assets</p>
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="py-2.5 px-4 rounded-lg border border-lightMode-text-main flex items-center gap-2"
+        >
+          <p>Add Asset</p>
         </button>
       </div>
 
       <div className="flex items-center justify-between mb-8">
-        {isLargeScreen && (
-          <button
-            onClick={handlePrevPage}
-            disabled={currentPage === 0}
-            className={`p-2 rounded-full ${
-              currentPage === 0
-                ? "text-gray-400 cursor-not-allowed"
-                : "text-lightMode-text-heading dark:text-darkMode-text-heading hover:bg-lightMode-background-main dark:hover:bg-darkMode-background-main"
-            }`}
-          >
-            <ChevronLeft size={24} />
-          </button>
+      {isLargeScreen && (
+          <AssetPagination
+            currentPage={currentPage}
+            pageCount={pageCount}
+            handlePrevPage={handlePrevPage}
+            handleNextPage={handleNextPage}
+            assets={displayedAssets}
+          />
         )}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 flex-grow mx-4 lg:gap-16">
-          {displayedAssets.map((asset: Asset) => (
-            <AssetCard
-              key={asset.asset_number}
-              AssetType={asset.asset_type}
-              AssetName={asset.asset_name}
-              NumberOfRooms={asset.sub_asset_count.toString()}
-              AssetNumber={asset.asset_number}
-            />
-          ))}
-        </div>
-        {isLargeScreen && (
-          <button
-            onClick={handleNextPage}
-            disabled={currentPage === pageCount - 1}
-            className={`p-2 rounded-full ${
-              currentPage === pageCount - 1
-                ? "text-gray-400 cursor-not-allowed"
-                : "text-lightMode-text-heading dark:text-darkMode-text-heading hover:bg-lightMode-background-main dark:hover:bg-darkMode-background-main"
-            }`}
-          >
-            <ChevronRight size={24} />
-          </button>
-        )}
+        {/* <AssetList assets={displayedAssets} /> */}
       </div>
+
+      <AssetModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        formData={formData}
+        handleInputChange={handleInputChange}
+        handleSubmit={handleSubmit}
+        isSubmitting={addAssetMutation.isPending}
+        isEditing={false}
+      ></AssetModal>
     </div>
   );
 };

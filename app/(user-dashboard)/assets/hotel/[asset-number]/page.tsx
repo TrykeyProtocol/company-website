@@ -1,13 +1,15 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import Graph from "@/library/components/organisms/graph";
 import AccessRooms from "@/library/components/organisms/access-rooms";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { axiosAuth } from "@/library/api/axios";
 import LineGraph from "@/library/components/organisms/line-graph";
+import AddSubAssetModal from "@/library/components/organisms/add-sub-asset-modal";
+import { CustomToaster } from "@/library/components/atoms/custom-toaster";
+import toast from "react-hot-toast";
 
 interface Asset {
   asset_number: string;
@@ -33,11 +35,63 @@ interface AssetStatus {
   }[];
 }
 
+interface SubAssetFormData {
+  room_number: string;
+  room_type: string;
+  price: number;
+}
+
 const Page = () => {
   const pathname = usePathname();
   const assetNumber = pathname?.split("/").pop();
+  const [isSubAssetModalOpen, setIsSubAssetModalOpen] = useState(false);
+  const [currentSubAsset, setCurrentSubAsset] = useState({
+    room_number: "",
+    room_type: "",
+    price: 0,
+  });
 
-  const { data: assets, isLoading: assetsLoading, isError: assetsError } = useQuery<Asset[], Error>({
+  const queryClient = useQueryClient();
+
+  const addSubAssetMutation = useMutation({
+    mutationFn: async (newSubAsset: SubAssetFormData) => {
+      const { data } = await axiosAuth.post(
+        `/assets/${assetNumber}/rooms/`,
+        newSubAsset
+      );
+      return data;
+    },
+    onSuccess: () => {
+      toast.success("asset created successfully");
+      queryClient.invalidateQueries({ queryKey: ["rooms", assetNumber] });
+      setIsSubAssetModalOpen(false);
+    },
+    onError: (error) => {
+      toast.error("error creating asset");
+      console.error("Error adding sub-asset:", error);
+    },
+  });
+
+  const handleSubAssetInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setCurrentSubAsset((prev) => ({
+      ...prev,
+      [name]: name === "price" ? parseFloat(value) : value,
+    }));
+  };
+
+  const handleSubAssetSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    addSubAssetMutation.mutate(currentSubAsset);
+  };
+
+  const {
+    data: assets,
+    isLoading: assetsLoading,
+    isError: assetsError,
+  } = useQuery<Asset[], Error>({
     queryKey: ["assets"],
     queryFn: async () => {
       const { data } = await axiosAuth.get<Asset[]>("/assets/");
@@ -45,10 +99,16 @@ const Page = () => {
     },
   });
 
-  const { data: assetStatus, isLoading: statusLoading, isError: statusError } = useQuery<AssetStatus, Error>({
+  const {
+    data: assetStatus,
+    isLoading: statusLoading,
+    isError: statusError,
+  } = useQuery<AssetStatus, Error>({
     queryKey: ["assetStatus", assetNumber],
     queryFn: async () => {
-      const { data } = await axiosAuth.get<AssetStatus>(`/assets/${assetNumber}/status/`);
+      const { data } = await axiosAuth.get<AssetStatus>(
+        `/assets/${assetNumber}/status/`
+      );
       return data;
     },
     enabled: !!assetNumber, // Only run this query if assetNumber is available
@@ -66,21 +126,28 @@ const Page = () => {
   }
 
   const generatedYield = parseFloat(assetData.total_revenue);
-  const expectedYield = 500000; 
+  const expectedYield = 500000;
 
   const percentage = (generatedYield / expectedYield) * 100;
 
-
   return (
     <div className="lg:flex h-full">
+      <CustomToaster />
       <div className="bg-lightMode-background-main dark:bg-darkMode-background-main border-r border-gray-200 dark:border-gray-800 lg:w-2/5 pt-8 px-8 lg:h-full flex flex-col gap-4">
-        <div className="flex gap-5 items-center">
+        <div className="flex gap-5 items-center justify-between">
           <div className="rounded-2xl px-6 font-semibold py-4 text-lightMode-text-accent dark:text-darkMode-text-accent bg-lightMode-button-background/10 dark:bg-darkMode-button-background/10 text-sm">
             Assets &gt;{" "}
             {assetData.asset_type.charAt(0).toUpperCase() +
               assetData.asset_type.slice(1)}
             s
           </div>
+
+          <button
+            className="py-3 px-4 rounded-lg border border-lightMode-text-main flex items-center gap-2 text-sm"
+            onClick={() => setIsSubAssetModalOpen(true)}
+          >
+            <p>Add Sub-Asset</p>
+          </button>
         </div>
         <Image
           src="/images/dashboard/hotel/hotel.png"
@@ -134,16 +201,16 @@ const Page = () => {
               <p className="text-sm">October </p>
             </div>
             {assetStatus && (
-          <LineGraph 
-            data={assetStatus}
-            xAxisDataKey="date"
-            yAxisDataKey="occupied_rooms"
-            xAxisLabel="Date"
-            yAxisLabel="Occupied Rooms"
-            areaColor="#f9733e"
-            areaFillColor="#fcb091"
-          />
-        )}
+              <LineGraph
+                data={assetStatus}
+                xAxisDataKey="date"
+                yAxisDataKey="occupied_rooms"
+                xAxisLabel="Date"
+                yAxisLabel="Occupied Rooms"
+                areaColor="#f9733e"
+                areaFillColor="#fcb091"
+              />
+            )}
             {/* <Graph /> */}
           </div>
         </div>
@@ -152,6 +219,17 @@ const Page = () => {
       <div className="lg:w-3/5 pt-12 px-8">
         <AccessRooms />
       </div>
+      {assetNumber && (
+        <AddSubAssetModal
+          isOpen={isSubAssetModalOpen}
+          onClose={() => setIsSubAssetModalOpen(false)}
+          isEditing={false}
+          formData={currentSubAsset}
+          handleInputChange={handleSubAssetInputChange}
+          handleSubmit={handleSubAssetSubmit}
+          isSubmitting={addSubAssetMutation.isPending}
+        />
+      )}
     </div>
   );
 };
