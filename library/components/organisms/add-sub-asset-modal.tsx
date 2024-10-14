@@ -40,7 +40,7 @@ const AddSubAssetModal: React.FC<AddSubAssetModalProps> = ({
       onClick={onClose}
     >
       <div
-        className=" bg-lightMode-background-main dark:bg-darkMode-background-main p-8 rounded-3xl max-w-md w-full"
+        className=" bg-lightMode-background-main dark:bg-darkMode-background-main p-8 rounded-3xl max-w-md w-full m-4"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-2xl font-bold mb-10 text-gray-800 dark:text-gray-200">

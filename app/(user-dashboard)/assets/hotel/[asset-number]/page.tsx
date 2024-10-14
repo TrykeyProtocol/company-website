@@ -217,7 +217,7 @@ const Page = () => {
       </div>
 
       <div className="lg:w-3/5 pt-12 px-8">
-        <AccessRooms />
+        <AccessRooms assetName={assetData.asset_name} />
       </div>
       {assetNumber && (
         <AddSubAssetModal

@@ -1,7 +1,6 @@
-import React from 'react';
-import { Power, PowerOff } from 'lucide-react';
-import { Room } from '@/library/types/type';
-
+import React from "react";
+import { Power, PowerOff } from "lucide-react";
+import { Room } from "@/library/types/type";
 
 interface RoomModalProps {
   room: Room;
@@ -22,6 +21,7 @@ interface RoomModalProps {
   paymentMutation: {
     isPending: boolean;
   };
+  assetName: string;
 }
 
 const RoomModal: React.FC<RoomModalProps> = ({
@@ -34,6 +34,7 @@ const RoomModal: React.FC<RoomModalProps> = ({
   handleInputChange,
   handlePaymentSubmit,
   paymentMutation,
+  assetName,
 }) => {
   return (
     <div
@@ -41,12 +42,12 @@ const RoomModal: React.FC<RoomModalProps> = ({
       onClick={onClose}
     >
       <div
-        className="bg-lightMode-background-main dark:bg-darkMode-background-main p-8 rounded-3xl flex gap-3"
+        className="bg-lightMode-background-main dark:bg-darkMode-background-main p-8 rounded-3xl m-4 max-w-3xl w-full  md:flex items-start gap-6"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Room details and control button */}
-        <div>
-          <div className="md:flex items-center gap-6">
+        <div className=" md:w-2/5 mb-6">
+          <div className=" md:flex items-center gap-6">
             <h2 className="text-xl md:text-2xl font-bold mb-4">
               Room {room.room_number}
             </h2>
@@ -79,14 +80,32 @@ const RoomModal: React.FC<RoomModalProps> = ({
                 room.status
                   ? "bg-green-200 border-green-800 border"
                   : "bg-red-400 border-red-800"
-              } ${controlMutation.isPending ? "cursor-not-allowed opacity-40" : ""}`}
+              } ${
+                controlMutation.isPending ? "cursor-not-allowed opacity-40" : ""
+              }`}
               onClick={() => onControlRoom(room)}
               disabled={controlMutation.isPending}
             >
               {controlMutation.isPending ? (
-                <svg className="animate-spin h-10 w-10 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <svg
+                  className="animate-spin h-10 w-10 text-gray-500"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
                 </svg>
               ) : room.status ? (
                 <Power color="#282828" width={40} height={40} />
@@ -95,15 +114,12 @@ const RoomModal: React.FC<RoomModalProps> = ({
               )}
             </button>
           </div>
-          {controlMutation.isError && (
-            <p className="text-red-500 mt-2">Error updating room status. Please try again.</p>
-          )}
         </div>
 
         {/* Payment form */}
-        <div className="border-l border-gray-200 dark:border-gray-800 pl-3">
+        <div className="md:border-l border-gray-200 dark:border-gray-800 pl-3 md:w-3/5">
           <h2 className="font-semibold mb-4">
-            Payment for room {room.room_number} of Asset {assetNumber}
+            Payment for room {room.room_number}, {assetName}
           </h2>
           <form onSubmit={handlePaymentSubmit} className="flex flex-col gap-8">
             <div className="relative border border-lightMode-text-heading dark:border-darkMode-text-heading rounded-full py-1 px-4">
@@ -166,9 +182,25 @@ const RoomModal: React.FC<RoomModalProps> = ({
               disabled={paymentMutation.isPending}
             >
               {paymentMutation.isPending && (
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <svg
+                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
                 </svg>
               )}
               Initiate Payment

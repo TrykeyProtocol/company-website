@@ -134,7 +134,7 @@ const Page = () => {
       </div>
 
       <div className="flex items-center justify-between mb-8">
-      {isLargeScreen && (
+        {isLargeScreen ? (
           <AssetPagination
             currentPage={currentPage}
             pageCount={pageCount}
@@ -142,8 +142,9 @@ const Page = () => {
             handleNextPage={handleNextPage}
             assets={displayedAssets}
           />
+        ) : (
+          <AssetList assets={displayedAssets} />
         )}
-        {/* <AssetList assets={displayedAssets} /> */}
       </div>
 
       <AssetModal

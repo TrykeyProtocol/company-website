@@ -33,7 +33,7 @@ const AssetModal: React.FC<ModalProps> = ({
       onClick={onClose}
     >
       <div
-        className="bg-lightMode-background-main dark:bg-darkMode-background-main p-8 max-w-md w-full rounded-3xl"
+        className="bg-lightMode-background-main dark:bg-darkMode-background-main p-8 max-w-md w-full rounded-3xl m-4"
         onClick={(e) => e.stopPropagation()}
       >
         <div>
