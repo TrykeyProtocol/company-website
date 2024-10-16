@@ -18,7 +18,7 @@ const config: Config = {
           background: {
             main: '#FFFFFF',
             secondary: '#f3f4f6',
-            alternate: '#FEE8E0'
+            alternate: '#F9FAFC'
           },
           text: {
             main: '#5F6D7E',
