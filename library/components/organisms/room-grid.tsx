@@ -95,6 +95,10 @@ const RoomGrid: React.FC<RoomGridProps> = ({ rooms, onRoomClick, assetNumber }) 
     setIsDeleteModalOpen(true);
   };
 
+  const isOccupied = (occupancy: string | number): boolean => {
+    return typeof occupancy === 'number' ? occupancy > 0 : parseInt(occupancy, 10) > 0;
+  };
+
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4 py-2.5 px-4 bg-lightMode-background-main dark:bg-darkMode-background-main rounded-3xl">
       {rooms.map((room) => (
@@ -105,13 +109,13 @@ const RoomGrid: React.FC<RoomGridProps> = ({ rooms, onRoomClick, assetNumber }) 
               ? "bg-green-100 dark:bg-green-900"
               : "bg-yellow-50 dark:bg-yellow-800"
           } ${
-            parseInt(room.occupancy as string, 10) > 0
+            isOccupied(room.occupancy)
               ? "border-2 border-blue-400 dark:border-blue-600"
               : "border-2 border-purple-400 dark:border-purple-600"
           }`}
         >
           <div
-            className={`p-3 py-2 rounded-full flex items-center cursor-pointer flex-grow`}
+            className={`p-3 rounded-full flex items-center cursor-pointer flex-grow`}
             onClick={() => onRoomClick(room)}
           >
             <Image
@@ -160,3 +164,4 @@ const RoomGrid: React.FC<RoomGridProps> = ({ rooms, onRoomClick, assetNumber }) 
 };
 
 export default RoomGrid;
+
