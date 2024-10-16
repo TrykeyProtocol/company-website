@@ -90,12 +90,13 @@ const AccessRooms: React.FC<{ assetName: string }> = ({ assetName }) => {
         const matchesSearch = room.room_number
           .toLowerCase()
           .includes(searchTerm.toLowerCase());
+        const occupancyNumber = parseInt(room.occupancy as string, 10);
         const matchesFilter =
           activeFilter === "all" ||
           (activeFilter === "paid" && room.status) ||
           (activeFilter === "unpaid" && !room.status) ||
-          (activeFilter === "occupied" && room.occupancy > 0) ||
-          (activeFilter === "unoccupied" && room.occupancy === 0);
+          (activeFilter === "occupied" && occupancyNumber > 0) ||
+          (activeFilter === "unoccupied" && occupancyNumber === 0);
         return matchesSearch && matchesFilter;
       });
       setFilteredRooms(filtered);

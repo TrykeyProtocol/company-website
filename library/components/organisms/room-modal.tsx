@@ -64,6 +64,12 @@ const RoomModal: React.FC<RoomModalProps> = ({
     controlMutation.isPending &&
     controlMutation.variables?.actionType === "access";
 
+  const isOccupied = (occupancy: string | number): boolean => {
+    return typeof occupancy === "number"
+      ? occupancy > 0
+      : parseInt(occupancy, 10) > 0;
+  };
+
   return (
     <div
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
@@ -90,12 +96,12 @@ const RoomModal: React.FC<RoomModalProps> = ({
               </span>
               <span
                 className={`py-1 px-2 rounded-full text-xs ${
-                  room.occupancy > 0
+                  isOccupied(room.occupancy)
                     ? "bg-blue-100 text-blue-600"
                     : "bg-purple-100 text-purple-600"
                 }`}
               >
-                {room.occupancy > 0 ? "occupied" : "unoccupied"}
+                {isOccupied(room.occupancy) ? "occupied" : "unoccupied"}
               </span>
             </div>
           </div>
@@ -104,7 +110,9 @@ const RoomModal: React.FC<RoomModalProps> = ({
             <h3 className="font-semibold mb-4 text-center">controls</h3>
             <div className="flex items-center gap-8 flex-col">
               <div className=" flex gap-3 items-center">
-                <p className=" w-1/3 font-semibold text-center text-sm">control electricity</p>
+                <p className=" w-1/3 font-semibold text-center text-sm">
+                  control electricity
+                </p>
                 <button
                   className={`px-6 py-4 rounded-3xl h-[80px] flex items-center justify-center ${
                     isElectricityOn
@@ -146,7 +154,9 @@ const RoomModal: React.FC<RoomModalProps> = ({
               </div>
 
               <div className=" flex gap-3 items-center">
-                <p className=" w-1/3 font-semibold text-center text-sm ">control door access</p>
+                <p className=" w-1/3 font-semibold text-center text-sm ">
+                  control door access
+                </p>
                 <button
                   className={`px-6 py-4 rounded-3xl h-[80px] flex items-center justify-center ${
                     isDoorUnlocked
