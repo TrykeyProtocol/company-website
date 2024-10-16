@@ -5,8 +5,7 @@ export interface Room {
   price: number;
   status: boolean;
   hotel: string;
-  occupancy: number;
-}
+  occupancy: string | number;}
 
 export interface Transaction {
   name: string;
