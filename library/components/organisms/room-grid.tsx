@@ -85,7 +85,7 @@ const RoomGrid: React.FC<RoomGridProps> = ({ rooms, onRoomClick, assetNumber }) 
     setFormData({
       room_number: room.room_number,
       room_type: room.room_type,
-      price: parseFloat(room.price) || 0, 
+      price: room.price || 0, 
     });
     setIsEditModalOpen(true);
   };

@@ -146,7 +146,7 @@ const Page = () => {
             className="py-3 px-4 rounded-lg border border-lightMode-text-main flex items-center gap-2 text-sm"
             onClick={() => setIsSubAssetModalOpen(true)}
           >
-            <p>Add Sub-Asset</p>
+            <p>Add Room</p>
           </button>
         </div>
         <Image

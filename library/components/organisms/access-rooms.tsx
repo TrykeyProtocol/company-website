@@ -15,6 +15,22 @@ interface PaymentFormData {
   email: string;
   name: string;
   phonenumber: string;
+  nights: number;
+}
+
+interface RoomStatus {
+  last_access_command: {
+    command: string;
+    timestamp: string;
+  };
+  last_electricity_command: {
+    command: string;
+    timestamp: string;
+  };
+  last_occupancy: {
+    status: string;
+    timestamp: string;
+  };
 }
 
 const AccessRooms: React.FC<{ assetName: string }> = ({ assetName }) => {
@@ -25,6 +41,7 @@ const AccessRooms: React.FC<{ assetName: string }> = ({ assetName }) => {
     email: "",
     name: "",
     phonenumber: "",
+    nights: 1,
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
@@ -32,6 +49,7 @@ const AccessRooms: React.FC<{ assetName: string }> = ({ assetName }) => {
   const [filteredRooms, setFilteredRooms] = useState<Room[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
+  const [roomStatus, setRoomStatus] = useState<RoomStatus | null>(null);
   const roomsPerPage = 16;
 
   const queryClient = useQueryClient();
@@ -90,8 +108,19 @@ const AccessRooms: React.FC<{ assetName: string }> = ({ assetName }) => {
   const currentRooms = filteredRooms.slice(indexOfFirstRoom, indexOfLastRoom);
   const totalPages = Math.ceil(filteredRooms.length / roomsPerPage);
 
-  const handleRoomClick = (room: Room) => {
+  const handleRoomClick = async (room: Room) => {
     setSelectedRoom(room);
+    if (assetNumber) {
+      try {
+        const { data } = await axiosAuth.get<RoomStatus>(
+          `https://dashboard.trykeyprotocol.com/api/assets/${assetNumber}/status/${room.room_number}/`
+        );
+        setRoomStatus(data);
+      } catch (error) {
+        console.error("Error fetching room status:", error);
+        toast.error("Failed to fetch room status");
+      }
+    }
     setIsModalOpen(true);
   };
 
@@ -99,36 +128,52 @@ const AccessRooms: React.FC<{ assetName: string }> = ({ assetName }) => {
     mutationFn: async ({
       roomNumber,
       action,
+      actionType,
     }: {
       roomNumber: string;
-      action: "turn_on" | "turn_off";
+      action: "turn_on" | "turn_off" | "unlock" | "lock";
+      actionType: "electricity" | "access";
     }) => {
       if (!assetNumber) throw new Error("Asset number is undefined");
       const response = await axiosAuth.post(
         `/assets/${assetNumber}/control/${roomNumber}/`,
         {
           data: action,
-          action_type: "electricity",
+          action_type: actionType,
         }
       );
       if (
         response.data &&
-        response.data.message === "Electricity control command sent."
+        response.data.message ===
+          `${
+            actionType.charAt(0).toUpperCase() + actionType.slice(1)
+          } control command sent.`
       ) {
-        return { success: true, roomNumber, action };
+        return { success: true, roomNumber, action, actionType };
       } else {
         throw new Error("Unexpected response from server");
       }
     },
     onSuccess: (data) => {
       if (data.success) {
-        const actionText = data.action === "turn_on" ? "turn on" : "turn off";
+        const actionText =
+          data.action.includes("on") || data.action === "unlock"
+            ? "activate"
+            : "deactivate";
         toast.success(
-          `Request to ${actionText} Room ${data.roomNumber} was successful. Changes will take effect soon.`,
+          `Request to ${actionText} ${data.actionType} for Room ${data.roomNumber} was successful. Changes will take effect soon.`,
           {
             duration: 5000,
           }
         );
+        // Refresh room status
+        if (assetNumber && selectedRoom) {
+          axiosAuth
+            .get<RoomStatus>(
+              `https://dashboard.trykeyprotocol.com/api/assets/${assetNumber}/status/${selectedRoom.room_number}/`
+            )
+            .then(({ data }) => setRoomStatus(data));
+        }
       }
     },
     onError: (error: Error) => {
@@ -142,32 +187,54 @@ const AccessRooms: React.FC<{ assetName: string }> = ({ assetName }) => {
     },
   });
 
-  const handleRoomControl = (room: Room) => {
-    if (!assetNumber) {
-      console.error("Asset number is undefined");
+  const handleRoomControl = (
+    room: Room,
+    actionType: "electricity" | "access"
+  ) => {
+    if (!assetNumber || !roomStatus) {
+      console.error("Asset number or room status is undefined");
       return;
     }
-    const action = room.status ? "turn_off" : "turn_on";
-    controlMutation.mutate({ roomNumber: room.room_number, action });
+    const currentStatus =
+      actionType === "electricity"
+        ? roomStatus.last_electricity_command.command
+        : roomStatus.last_access_command.command;
+    const action =
+      currentStatus === "turn_on" || currentStatus === "unlock"
+        ? actionType === "electricity"
+          ? "turn_off"
+          : "lock"
+        : actionType === "electricity"
+        ? "turn_on"
+        : "unlock";
+    controlMutation.mutate({
+      roomNumber: room.room_number,
+      action,
+      actionType,
+    });
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setPaymentFormData((prev) => ({ ...prev, [name]: value }));
+    setPaymentFormData((prev) => ({
+      ...prev,
+      [name]: name === "nights" ? parseInt(value) : value,
+    }));
   };
 
   const paymentMutation = useMutation({
     mutationFn: async (formData: PaymentFormData) => {
       if (!assetNumber || !selectedRoom)
         throw new Error("Asset number or room is undefined");
+      const amount = formData.nights * selectedRoom.price;
       const response = await axiosAuth.post("/payment/init/", {
         email: formData.email,
         name: formData.name,
         phonenumber: formData.phonenumber,
-        amount: 5000.0,
+        amount: amount,
         redirect_url: "localhost:8000/api/payment/verify",
         title: "Room Booking",
-        description: `Payment for room ${selectedRoom.room_number} of Asset ${assetNumber}`,
+        description: `Payment for room ${selectedRoom.room_number} of Asset ${assetNumber} for ${formData.nights} nights`,
         asset_number: assetNumber,
         sub_asset_number: selectedRoom.room_number,
         currency: "NGN",
@@ -226,7 +293,7 @@ const AccessRooms: React.FC<{ assetName: string }> = ({ assetName }) => {
         isLoading={isLoadingTransactions}
         isError={isErrorTransactions}
       />
-      {isModalOpen && selectedRoom && (
+      {isModalOpen && selectedRoom && roomStatus && (
         <RoomModal
           room={selectedRoom}
           assetNumber={assetNumber}
@@ -238,6 +305,7 @@ const AccessRooms: React.FC<{ assetName: string }> = ({ assetName }) => {
           handlePaymentSubmit={handlePaymentSubmit}
           paymentMutation={paymentMutation}
           assetName={assetName}
+          roomStatus={roomStatus}
         />
       )}
     </div>

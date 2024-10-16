@@ -1,20 +1,22 @@
-import React from "react";
-import { Power, PowerOff } from "lucide-react";
 import { Room } from "@/library/types/type";
+import { DoorClosed, DoorOpen, Power, PowerOff } from "lucide-react";
+import React from "react";
 
 interface RoomModalProps {
   room: Room;
   assetNumber: string | undefined;
   onClose: () => void;
-  onControlRoom: (room: Room) => void;
+  onControlRoom: (room: Room, actionType: "electricity" | "access") => void;
   controlMutation: {
     isPending: boolean;
     isError: boolean;
+    variables?: { actionType: "electricity" | "access" };
   };
   paymentFormData: {
     email: string;
     name: string;
     phonenumber: string;
+    nights: number;
   };
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handlePaymentSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
@@ -22,6 +24,20 @@ interface RoomModalProps {
     isPending: boolean;
   };
   assetName: string;
+  roomStatus: {
+    last_access_command: {
+      command: string;
+      timestamp: string;
+    };
+    last_electricity_command: {
+      command: string;
+      timestamp: string;
+    };
+    last_occupancy: {
+      status: string;
+      timestamp: string;
+    };
+  };
 }
 
 const RoomModal: React.FC<RoomModalProps> = ({
@@ -35,7 +51,19 @@ const RoomModal: React.FC<RoomModalProps> = ({
   handlePaymentSubmit,
   paymentMutation,
   assetName,
+  roomStatus,
 }) => {
+  const isElectricityOn =
+    roomStatus.last_electricity_command.command === "turn_on";
+  const isDoorUnlocked = roomStatus.last_access_command.command === "unlock";
+
+  const isElectricityLoading =
+    controlMutation.isPending &&
+    controlMutation.variables?.actionType === "electricity";
+  const isAccessLoading =
+    controlMutation.isPending &&
+    controlMutation.variables?.actionType === "access";
+
   return (
     <div
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
@@ -45,9 +73,8 @@ const RoomModal: React.FC<RoomModalProps> = ({
         className="bg-lightMode-background-main dark:bg-darkMode-background-main p-8 rounded-3xl m-4 max-w-3xl w-full  md:flex items-start gap-6"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Room details and control button */}
-        <div className=" md:w-2/5 mb-6">
-          <div className=" md:flex items-center gap-6">
+        <div className="md:w-2/5 mb-6">
+          <div className="md:flex items-center gap-6">
             <h2 className="text-xl md:text-2xl font-bold mb-4">
               Room {room.room_number}
             </h2>
@@ -73,46 +100,91 @@ const RoomModal: React.FC<RoomModalProps> = ({
             </div>
           </div>
 
-          <div className="mt-8 flex items-center gap-6">
-            <h3 className="font-semibold mb-2">controls</h3>
-            <button
-              className={`px-6 py-4 rounded-3xl h-[80px] flex items-center justify-center ${
-                room.status
-                  ? "bg-green-200 border-green-800 border"
-                  : "bg-red-400 border-red-800"
-              } ${
-                controlMutation.isPending ? "cursor-not-allowed opacity-40" : ""
-              }`}
-              onClick={() => onControlRoom(room)}
-              disabled={controlMutation.isPending}
-            >
-              {controlMutation.isPending ? (
-                <svg
-                  className="animate-spin h-10 w-10 text-gray-500"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
+          <div className="mt-8 flex flex-col items-start ">
+            <h3 className="font-semibold mb-4 text-center">controls</h3>
+            <div className="flex items-center gap-8 flex-col">
+              <div className=" flex gap-3 items-center">
+                <p className=" w-1/3 font-semibold text-center text-sm">control electricity</p>
+                <button
+                  className={`px-6 py-4 rounded-3xl h-[80px] flex items-center justify-center ${
+                    isElectricityOn
+                      ? "bg-green-200 border-green-800 border"
+                      : "bg-red-400 border-red-800"
+                  } ${
+                    isElectricityLoading ? "cursor-not-allowed opacity-40" : ""
+                  }`}
+                  onClick={() => onControlRoom(room, "electricity")}
+                  disabled={isElectricityLoading}
                 >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-              ) : room.status ? (
-                <Power color="#282828" width={40} height={40} />
-              ) : (
-                <PowerOff color="#282828" width={40} height={40} />
-              )}
-            </button>
+                  {isElectricityLoading ? (
+                    <svg
+                      className="animate-spin h-10 w-10 text-gray-500"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                  ) : isElectricityOn ? (
+                    <Power color="#282828" width={40} height={40} />
+                  ) : (
+                    <PowerOff color="#282828" width={40} height={40} />
+                  )}
+                </button>
+              </div>
+
+              <div className=" flex gap-3 items-center">
+                <p className=" w-1/3 font-semibold text-center text-sm ">control door access</p>
+                <button
+                  className={`px-6 py-4 rounded-3xl h-[80px] flex items-center justify-center ${
+                    isDoorUnlocked
+                      ? "bg-green-200 border-green-800 border"
+                      : "bg-red-400 border-red-800"
+                  } ${isAccessLoading ? "cursor-not-allowed opacity-40" : ""}`}
+                  onClick={() => onControlRoom(room, "access")}
+                  disabled={isAccessLoading}
+                >
+                  {isAccessLoading ? (
+                    <svg
+                      className="animate-spin h-10 w-10 text-gray-500"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                  ) : isDoorUnlocked ? (
+                    <DoorOpen color="#282828" width={40} height={40} />
+                  ) : (
+                    <DoorClosed color="#282828" width={40} height={40} />
+                  )}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -175,6 +247,29 @@ const RoomModal: React.FC<RoomModalProps> = ({
                 value={paymentFormData.phonenumber}
                 onChange={handleInputChange}
               />
+            </div>
+            <div className="relative border border-lightMode-text-heading dark:border-darkMode-text-heading rounded-full py-1 px-4">
+              <label
+                htmlFor="nights"
+                className="absolute -top-2 left-6 bg-lightMode-background-main dark:bg-darkMode-background-main px-2 text-xs font-medium text-lightMode-text-heading dark:text-darkMode-text-heading"
+              >
+                Number of Nights
+              </label>
+              <input
+                id="nights"
+                name="nights"
+                type="number"
+                required
+                min="1"
+                className="w-full border-none text-lightMode-text-main dark:text-darkMode-text-main focus:outline-none px-0 py-1 placeholder-gray-400 autofill-fix text-sm placeholder:text-sm"
+                placeholder="Enter Number of Nights"
+                value={paymentFormData.nights}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div className="text-sm mb-4">
+              Total Amount: ₦
+              {(paymentFormData.nights * room.price).toLocaleString()}
             </div>
             <button
               type="submit"
