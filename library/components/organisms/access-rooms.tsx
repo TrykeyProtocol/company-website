@@ -51,7 +51,8 @@ const AccessRooms: React.FC<{ assetName: string }> = ({ assetName }) => {
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [roomStatus, setRoomStatus] = useState<RoomStatus | null>(null);
   const roomsPerPage = 16;
-
+  const redirectURL = "https://dashboard.trykeyprotocol.com/api/payment/verify";
+  const [paymentUrls, setPaymentUrls] = useState<{ [key: string]: string }>({});
   const queryClient = useQueryClient();
 
   const {
@@ -233,7 +234,7 @@ const AccessRooms: React.FC<{ assetName: string }> = ({ assetName }) => {
         name: formData.name,
         phonenumber: formData.phonenumber,
         amount: amount,
-        redirect_url: "localhost:8000/api/payment/verify",
+        redirect_url: "https://dashboard.trykeyprotocol.com/api/payment/verify",
         title: "Room Booking",
         description: `Payment for room ${selectedRoom.room_number} of Asset ${assetNumber} for ${formData.nights} nights`,
         asset_number: assetNumber,
@@ -245,7 +246,10 @@ const AccessRooms: React.FC<{ assetName: string }> = ({ assetName }) => {
     },
     onSuccess: (data) => {
       console.log("Payment initiated successfully:", data);
-      toast.success("Payment initiated successfully!");
+      setPaymentUrls(prev => ({
+        ...prev,
+        [selectedRoom!.room_number]: data.payment_link
+      }));      toast.success("Payment initiated successfully!");
       queryClient.invalidateQueries({
         queryKey: ["transactions", assetNumber],
       });
@@ -307,6 +311,7 @@ const AccessRooms: React.FC<{ assetName: string }> = ({ assetName }) => {
           paymentMutation={paymentMutation}
           assetName={assetName}
           roomStatus={roomStatus}
+          redirectURL={paymentUrls[selectedRoom.room_number] || ""}
         />
       )}
     </div>

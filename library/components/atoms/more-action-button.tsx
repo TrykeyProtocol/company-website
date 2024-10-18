@@ -14,7 +14,7 @@ const AssetActionButton: React.FC<AssetActionButtonProps> = ({ onEdit, onDelete 
     <div className="relative">
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="p-2 rounded-full  hover:bg-gray-300/20"
+        className="p-1 rounded-full  hover:bg-gray-300/20"
       >
         <MoreVertical size={16} />
       </button>
