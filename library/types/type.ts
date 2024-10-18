@@ -5,7 +5,8 @@ export interface Room {
   price: number;
   status: boolean;
   hotel: string;
-  occupancy: string | number;}
+  occupancy: string | number;
+}
 
 export interface Transaction {
   name: string;
@@ -16,7 +17,6 @@ export interface Transaction {
 }
 
 export type AssetType = "vehicle" | "hotel";
-
 
 export interface Asset {
   asset_number: string;
