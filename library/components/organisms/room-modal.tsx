@@ -290,7 +290,7 @@ const RoomModal: React.FC<RoomModalProps> = ({
                   onChange={handleInputChange}
                 />
               </div>
-              <div className="text-sm mb-4">
+              <div className="text-sm mb-4 font-semibold">
                 Total Amount: ₦
                 {(paymentFormData.nights * room.price).toLocaleString()}
               </div>

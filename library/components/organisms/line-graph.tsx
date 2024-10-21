@@ -19,6 +19,7 @@ interface GraphData {
   total_rooms: number;
   total_active_rooms: number;
   total_occupied_rooms: number;
+  expected_yield: number;
   daily_stats: DailyStats[];
 }
 
@@ -30,6 +31,7 @@ interface GraphProps {
   yAxisLabel: string;
   areaColor?: string;
   areaFillColor?: string;
+  totalRooms: number;
 }
 
 const formatDate = (dateString: string): string => {
@@ -44,7 +46,8 @@ const LineGraph: React.FC<GraphProps> = ({
   xAxisLabel, 
   yAxisLabel,
   areaColor = "#f9733e",
-  areaFillColor = "#fcb091"
+  areaFillColor = "#fcb091",
+  totalRooms
 }) => {
   const chartData = data.daily_stats.map(item => ({
     ...item,
@@ -79,6 +82,8 @@ const LineGraph: React.FC<GraphProps> = ({
         <YAxis 
           tick={{ fontSize: 10 }}
           width={60}
+          domain={[0, totalRooms]}
+          allowDecimals={false}
         >
           <Label 
             value={yAxisLabel} 

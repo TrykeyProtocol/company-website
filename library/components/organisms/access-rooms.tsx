@@ -138,20 +138,21 @@ const AccessRooms: React.FC<{ assetName: string }> = ({ assetName }) => {
     }) => {
       if (!assetNumber) throw new Error("Asset number is undefined");
       const response = await axiosAuth.post(
-        `/assets/${assetNumber}/control/${roomNumber}/`,
+        `/assets/${assetNumber}/direct_control/${roomNumber}/`,
         {
           data: action,
           action_type: actionType,
         }
       );
-      if (
-        response.data &&
-        response.data.message ===
-          `${
-            actionType.charAt(0).toUpperCase() + actionType.slice(1)
-          } control command sent.`
-      ) {
-        return { success: true, roomNumber, action, actionType };
+      if (response.data && response.data.message === "Control request sent and expiry scheduled") {
+        return { 
+          success: true, 
+          roomNumber, 
+          action, 
+          actionType,
+          expiryTime: response.data.expiry_time,
+          expiryAction: response.data.expiry_data
+        };
       } else {
         throw new Error("Unexpected response from server");
       }
@@ -163,7 +164,7 @@ const AccessRooms: React.FC<{ assetName: string }> = ({ assetName }) => {
             ? "activate"
             : "deactivate";
         toast.success(
-          `Request to ${actionText} ${data.actionType} for Room ${data.roomNumber} was successful. Changes will take effect soon.`,
+          `Request to ${actionText} ${data.actionType} for Room ${data.roomNumber} was successful. Changes will take effect soon and expire at ${new Date(data.expiryTime).toLocaleString()}.`,
           {
             duration: 5000,
           }
@@ -178,10 +179,11 @@ const AccessRooms: React.FC<{ assetName: string }> = ({ assetName }) => {
         }
       }
     },
-    onError: (error: Error) => {
+    onError: (error: any) => {
       console.error("Control mutation error:", error);
+      const errorMessage = error.response?.data?.error || error.message || "An unknown error occurred";
       toast.error(
-        `Failed to update room status: ${error.message}. Please try again.`,
+        `Failed to update room status: ${errorMessage}. Please try again.`,
         {
           duration: 5000,
         }

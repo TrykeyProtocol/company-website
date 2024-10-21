@@ -10,6 +10,8 @@ import LineGraph from "@/library/components/organisms/line-graph";
 import AddSubAssetModal from "@/library/components/organisms/add-sub-asset-modal";
 import { CustomToaster } from "@/library/components/atoms/custom-toaster";
 import toast from "react-hot-toast";
+import ManageUsersModal from "@/library/components/organisms/user-modal";
+// import ManageUsersModal from "@/library/components/organisms/manage-users-modal";
 
 interface Asset {
   asset_number: string;
@@ -28,12 +30,15 @@ interface AssetStatus {
   total_rooms: number;
   total_active_rooms: number;
   total_occupied_rooms: number;
+  expected_yield: number;
   daily_stats: {
     date: string;
     occupied_rooms: number;
     active_rooms: number;
+    expected_yield: number;
   }[];
 }
+
 
 interface SubAssetFormData {
   room_number: string;
@@ -45,6 +50,7 @@ const Page = () => {
   const pathname = usePathname();
   const assetNumber = pathname?.split("/").pop();
   const [isSubAssetModalOpen, setIsSubAssetModalOpen] = useState(false);
+  const [isManageUsersModalOpen, setIsManageUsersModalOpen] = useState(false);
   const [currentSubAsset, setCurrentSubAsset] = useState({
     room_number: "",
     room_type: "",
@@ -111,7 +117,7 @@ const Page = () => {
       );
       return data;
     },
-    enabled: !!assetNumber, // Only run this query if assetNumber is available
+    enabled: !!assetNumber,
   });
 
   if (assetsLoading || statusLoading) return <div>Loading...</div>;
@@ -126,22 +132,29 @@ const Page = () => {
   }
 
   const generatedYield = parseFloat(assetData.total_revenue);
-  const expectedYield = 500000;
+  const expectedYield = assetStatus?.expected_yield ?? 0;
 
-  const percentage = (generatedYield / expectedYield) * 100;
+  const percentage = expectedYield > 0 ? (generatedYield / expectedYield) * 100 : 0;
 
   return (
     <div className="lg:flex h-full">
       <CustomToaster />
       <div className="bg-lightMode-background-main dark:bg-darkMode-background-main border-r border-gray-200 dark:border-gray-800 lg:w-2/5 pt-8 px-8 lg:h-full flex flex-col gap-4">
         <div className="flex gap-5 items-center justify-between">
-          <div className="rounded-2xl px-6 font-semibold py-4 text-lightMode-text-accent dark:text-darkMode-text-accent bg-lightMode-button-background/10 dark:bg-darkMode-button-background/10 text-sm">
+          <div className="rounded-2xl px-4 font-semibold py-3 text-lightMode-text-accent dark:text-darkMode-text-accent bg-lightMode-button-background/10 dark:bg-darkMode-button-background/10 text-sm">
             Assets &gt;{" "}
             {assetData.asset_type.charAt(0).toUpperCase() +
               assetData.asset_type.slice(1)}
             s
           </div>
+          {/* add the modal to this button */}
 
+          <button
+            className="py-3 px-4 rounded-lg border border-lightMode-text-main flex items-center gap-2 text-sm"
+            onClick={() => setIsManageUsersModalOpen(true)}
+          >
+            <p>Add User</p>
+          </button>
           <button
             className="py-3 px-4 rounded-lg border border-lightMode-text-main flex items-center gap-2 text-sm"
             onClick={() => setIsSubAssetModalOpen(true)}
@@ -160,40 +173,42 @@ const Page = () => {
         <div className="flex flex-col pt-2 items-center gap-2">
           <h1 className="text-lg font-semibold">{assetData.asset_name}</h1>
 
-          <div className="bg-lightMode-brand-primary/10 dark:bg-darkMode-brand-primary/10 flex flex-col gap-2.5 rounded-3xl w-full py-3 px-6 mx-3.5">
-            <div className="flex justify-between">
-              <div>
-                <p className="text-sm">Yield Generated</p>
-                <p className="font-semibold">
-                  ₦{generatedYield.toLocaleString()}
-                </p>
+          {assetData.user_role == "admin" && (
+            <div className="bg-lightMode-brand-primary/10 dark:bg-darkMode-brand-primary/10 flex flex-col gap-2.5 rounded-3xl w-full py-3 px-6 mx-3.5">
+              <div className="flex justify-between">
+                <div>
+                  <p className="text-sm">Yield Generated</p>
+                  <p className="font-semibold">
+                    ₦{generatedYield.toLocaleString()}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm">Expected Yield</p>
+                  <p className="font-semibold">
+                    ₦{expectedYield.toLocaleString()}
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm">Expected Yield</p>
-                <p className="font-semibold">
-                  ₦{expectedYield.toLocaleString()}
-                </p>
-              </div>
-            </div>
 
-            <div className="relative w-full pt-5">
-              <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
+              <div className="relative w-full pt-5">
+                <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-lightMode-brand-accent dark:bg-darkMode-brand-accent rounded-l-full"
+                    style={{ width: `${percentage}%` }}
+                  />
+                </div>
                 <div
-                  className="h-full bg-lightMode-brand-accent dark:bg-darkMode-brand-accent rounded-l-full"
-                  style={{ width: `${percentage}%` }}
-                />
-              </div>
-              <div
-                className="absolute top-0 text-xs font-semibold text-orange-500"
-                style={{
-                  left: `${percentage}%`,
-                  transform: "translateX(-50%)",
-                }}
-              >
-                {percentage.toFixed(0)}%
+                  className="absolute top-0 text-xs font-semibold text-orange-500"
+                  style={{
+                    left: `${percentage}%`,
+                    transform: "translateX(-50%)",
+                  }}
+                >
+                  {percentage.toFixed(0)}%
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           <div className="border-t-2 border-gray-200 dark:border-gray-800 w-full rounded-3xl h-64 pt-4 mt-6">
             <div className="flex justify-between px-5 pb-4">
@@ -201,16 +216,17 @@ const Page = () => {
               <p className="text-sm">October </p>
             </div>
             {assetStatus && (
-              <LineGraph
-                data={assetStatus}
-                xAxisDataKey="date"
-                yAxisDataKey="occupied_rooms"
-                xAxisLabel="Date"
-                yAxisLabel="Occupied Rooms"
-                areaColor="#f9733e"
-                areaFillColor="#fcb091"
-              />
-            )}
+          <LineGraph
+            data={assetStatus}
+            xAxisDataKey="date"
+            yAxisDataKey="occupied_rooms"
+            xAxisLabel="Date"
+            yAxisLabel="Occupied Rooms"
+            areaColor="#f9733e"
+            areaFillColor="#fcb091"
+            totalRooms={assetStatus.total_rooms}
+          />
+        )}
             {/* <Graph /> */}
           </div>
         </div>
@@ -220,15 +236,22 @@ const Page = () => {
         <AccessRooms assetName={assetData.asset_name} />
       </div>
       {assetNumber && (
-        <AddSubAssetModal
-          isOpen={isSubAssetModalOpen}
-          onClose={() => setIsSubAssetModalOpen(false)}
-          isEditing={false}
-          formData={currentSubAsset}
-          handleInputChange={handleSubAssetInputChange}
-          handleSubmit={handleSubAssetSubmit}
-          isSubmitting={addSubAssetMutation.isPending}
-        />
+        <>
+          <AddSubAssetModal
+            isOpen={isSubAssetModalOpen}
+            onClose={() => setIsSubAssetModalOpen(false)}
+            isEditing={false}
+            formData={currentSubAsset}
+            handleInputChange={handleSubAssetInputChange}
+            handleSubmit={handleSubAssetSubmit}
+            isSubmitting={addSubAssetMutation.isPending}
+          />
+          <ManageUsersModal
+            isOpen={isManageUsersModalOpen}
+            onClose={() => setIsManageUsersModalOpen(false)}
+            assetNumber={assetNumber}
+          />
+        </>
       )}
     </div>
   );
