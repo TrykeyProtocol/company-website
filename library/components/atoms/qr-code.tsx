@@ -50,7 +50,7 @@ const QRCodeComponent: React.FC<QRCodeComponentProps> = ({ url }) => {
       </button>
       <p className=" text-sm">
         or click
-        {" "}<a href={url} className=" text-lightMode-brand-accent hover:underline ">here</a>
+        {" "}<a href={url} target="_blank" className=" text-lightMode-brand-accent hover:underline ">here</a>
       </p>
     </div>
   );

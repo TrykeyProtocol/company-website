@@ -67,9 +67,13 @@ const TrykeySensors = () => (
       height={80}
     />
     <h3 className="font-bold text-center">Trykey Management Kit</h3>
-    <button className="bg-white text-black font-semibold py-1.5 w-full rounded mt-2">
+    <a
+      href="/"
+      target="_blank"
+      className="bg-white text-black font-semibold py-1.5 w-full rounded mt-2 text-center"
+    >
       Buy
-    </button>
+    </a>
   </div>
 );
 
@@ -131,13 +135,10 @@ export const DashboardNavMobile: React.FC<{
           <nav className="mt-8 ">
             <ul className="flex flex-col gap-4">
               {navItems.map((item) => (
-                <li key={item.name}
-                onClick={() => setIsSidebarOpen(false)}
->
+                <li key={item.name} onClick={() => setIsSidebarOpen(false)}>
                   <NavLink
                     {...item}
                     isActive={pathname.startsWith(item.href)}
-
                   />
                 </li>
               ))}
