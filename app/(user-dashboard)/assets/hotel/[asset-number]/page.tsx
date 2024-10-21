@@ -39,7 +39,6 @@ interface AssetStatus {
   }[];
 }
 
-
 interface SubAssetFormData {
   room_number: string;
   room_type: string;
@@ -134,7 +133,8 @@ const Page = () => {
   const generatedYield = parseFloat(assetData.total_revenue);
   const expectedYield = assetStatus?.expected_yield ?? 0;
 
-  const percentage = expectedYield > 0 ? (generatedYield / expectedYield) * 100 : 0;
+  const percentage =
+    expectedYield > 0 ? (generatedYield / expectedYield) * 100 : 0;
 
   return (
     <div className="lg:flex h-full">
@@ -147,14 +147,15 @@ const Page = () => {
               assetData.asset_type.slice(1)}
             s
           </div>
-          {/* add the modal to this button */}
+          {assetData.user_role == "admin" && (
+            <button
+              className="py-3 px-4 rounded-lg border border-lightMode-text-main flex items-center gap-2 text-sm"
+              onClick={() => setIsManageUsersModalOpen(true)}
+            >
+              <p>Manage User</p>
+            </button>
+          )}
 
-          <button
-            className="py-3 px-4 rounded-lg border border-lightMode-text-main flex items-center gap-2 text-sm"
-            onClick={() => setIsManageUsersModalOpen(true)}
-          >
-            <p>Add User</p>
-          </button>
           <button
             className="py-3 px-4 rounded-lg border border-lightMode-text-main flex items-center gap-2 text-sm"
             onClick={() => setIsSubAssetModalOpen(true)}
@@ -216,17 +217,17 @@ const Page = () => {
               <p className="text-sm">October </p>
             </div>
             {assetStatus && (
-          <LineGraph
-            data={assetStatus}
-            xAxisDataKey="date"
-            yAxisDataKey="occupied_rooms"
-            xAxisLabel="Date"
-            yAxisLabel="Occupied Rooms"
-            areaColor="#f9733e"
-            areaFillColor="#fcb091"
-            totalRooms={assetStatus.total_rooms}
-          />
-        )}
+              <LineGraph
+                data={assetStatus}
+                xAxisDataKey="date"
+                yAxisDataKey="occupied_rooms"
+                xAxisLabel="Date"
+                yAxisLabel="Occupied Rooms"
+                areaColor="#f9733e"
+                areaFillColor="#fcb091"
+                totalRooms={assetStatus.total_rooms}
+              />
+            )}
             {/* <Graph /> */}
           </div>
         </div>

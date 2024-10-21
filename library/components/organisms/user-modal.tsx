@@ -84,9 +84,7 @@ const ManageUsersModal: React.FC<ManageUsersModalProps> = ({
   };
 
   const handleDeleteUser = (email: string) => {
-    if (window.confirm("Are you sure you want to remove this user?")) {
-      deleteUserMutation.mutate(email);
-    }
+    deleteUserMutation.mutate(email);
   };
   if (!isOpen) return null;
 
@@ -96,44 +94,10 @@ const ManageUsersModal: React.FC<ManageUsersModalProps> = ({
       onClick={onClose}
     >
       <div
-        className=" bg-lightMode-background-main dark:bg-darkMode-background-main p-8 rounded-3xl max-w-3xl w-full m-4 md:flex gap-4"
+        className=" bg-lightMode-background-main dark:bg-darkMode-background-main p-8 rounded-3xl max-w-3xl w-full m-4 flex flex-col md:flex-row gap-8"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="md:w-2/3">
-          <h3 className="text-lg font-semibold mb-2">Invited Users</h3>
-          {isLoading && <p>Loading users...</p>}
-          {isError && <p>Error loading users</p>}
-          {users?.length == 0 && (
-            <p>
-              You don't have any collaboration, start by inviting users to join
-              you!
-            </p>
-          )}
-          {users && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {users.map((user) => (
-                <div
-                  key={user.username}
-                  className="p-3 border rounded-md hover:bg-gray-100 transition-colors relative group"
-                >
-                  <p className="font-semibold">{user.full_name}</p>
-                  <p className="text-sm text-lightMode-text-main dark:text-darkMode-text-main">{user.username}</p>
-                  <p className="text-xs text-lightMode-text-main dark:text-darkMode-text-main capitalize">
-                    {user.role}
-                  </p>
-                  <button
-                    onClick={() => handleDeleteUser(user.username)}
-                    className="absolute bottom-2 text-xs right-2 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    Delete
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <div className=" md:w-1/3">
+        <div className=" md:w-1/3 md:order-1">
           <h3 className="text-lg font-semibold mb-2">Invite Users</h3>
 
           <form onSubmit={handleInviteUser} className="space-y-4">
@@ -169,7 +133,7 @@ const ManageUsersModal: React.FC<ManageUsersModalProps> = ({
             </div>
             <button
               type="submit"
-            className="px-4 py-2 w-full bg-lightMode-button-background dark:bg-darkMode-button-background text-lightMode-button-text dark:text-darkMode-button-text hover:bg-lightMode-button-background/90 dark:hover:bg-darkMode-button-background/90 focus:outline-none focus:ring-2 focus:ring-lightMode-button-background dark:focus:ring-darkMode-button-background disabled:opacity-50 rounded-full flex items-center justify-center"
+              className="px-4 py-2 w-full bg-lightMode-button-background dark:bg-darkMode-button-background text-lightMode-button-text dark:text-darkMode-button-text hover:bg-lightMode-button-background/90 dark:hover:bg-darkMode-button-background/90 focus:outline-none focus:ring-2 focus:ring-lightMode-button-background dark:focus:ring-darkMode-button-background disabled:opacity-50 rounded-full flex items-center justify-center"
               disabled={inviteUserMutation.isPending}
             >
               {inviteUserMutation.isPending && (
@@ -198,7 +162,74 @@ const ManageUsersModal: React.FC<ManageUsersModalProps> = ({
             </button>
           </form>
         </div>
+        <div className="md:w-2/3 ">
+          <h3 className="text-lg font-semibold mb-2">Invited Users</h3>
+          {isLoading && <p>Loading users...</p>}
+          {isError && <p>Error loading users</p>}
+          {users?.length == 0 && (
+            <p>
+              You don't have any collaboration, start by inviting users to join
+              you!
+            </p>
+          )}
+          {users && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {users.map((user) => (
+                <div
+                  key={user.username}
+                  className="p-3 border rounded-md hover:bg-gray-100 transition-colors relative group"
+                >
+                  <p className="font-semibold">{user.full_name}</p>
+                  <p className="text-sm text-lightMode-text-main dark:text-darkMode-text-main">
+                    {user.username}
+                  </p>
+                  <p className="text-xs text-lightMode-text-main dark:text-darkMode-text-main capitalize">
+                    {user.role}
+                  </p>
+                  <button
+                    onClick={() => handleDeleteUser(user.username)}
+                    className="absolute bottom-0 text-xs right-0 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity tooltip"
+                    data-tooltip="Warning: This action is immediate and cannot be undone!"
+                  >
+                    Delete
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
+      <style jsx>{`
+        .tooltip {
+          position: relative;
+        }
+        .tooltip::before {
+          content: attr(data-tooltip);
+          position: absolute;
+          bottom: 100%;
+          right: 0;
+          background-color: #333;
+          color: white;
+          padding: 4px 8px;
+          border-radius: 4px;
+          font-size: 12px;
+          white-space: nowrap;
+          opacity: 0;
+          visibility: hidden;
+          transition: opacity 0.3s, visibility 0.3s;
+        }
+        .tooltip:hover::before,
+        .tooltip:focus::before {
+          opacity: 1;
+          visibility: visible;
+        }
+        @media (hover: none) {
+          .tooltip:active::before {
+            opacity: 1;
+            visibility: visible;
+          }
+        }
+      `}</style>
     </div>
   );
 };
