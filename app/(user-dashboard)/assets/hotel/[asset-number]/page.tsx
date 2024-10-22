@@ -147,7 +147,7 @@ const Page = () => {
               assetData.asset_type.slice(1)}
             s
           </div>
-          {assetData.user_role == "admin" && (
+          {["admin", "manager"].includes(assetData.user_role) && (
             <button
               className="py-3 px-4 rounded-lg border border-lightMode-text-main flex items-center gap-2 text-sm"
               onClick={() => setIsManageUsersModalOpen(true)}
